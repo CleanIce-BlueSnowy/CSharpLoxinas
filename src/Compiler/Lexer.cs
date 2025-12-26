@@ -1,3 +1,4 @@
+using Error;
 using Information;
 
 namespace Compiler;
@@ -13,22 +14,73 @@ public partial class Lexer {
     private Token previous;
     private Token current;
 
-    public Token Previous {
-        get => previous;
-    }
-
     public Lexer(string source) {
         this.source = source;
         var lines = source.Split();
         var endIdx = lines[^1].Length;
-        endLocation = new(new Position(lines.Length, endIdx), new Position(lines.Length, endIdx + 1));
+        endLocation = new(new(lines.Length, endIdx), new(lines.Length, endIdx + 1));
         tokenEOF = new(endLocation);
         previous = tokenEOF;
         current = tokenEOF;
     }
 
+    public Token Previous {
+        get => previous;
+    }
+
+    public Token Advance() {
+        if (AtEnd()) {
+            return tokenEOF;
+        } else if (current is TokenEOF) {
+            UpdateToken();
+            UpdateToken();
+            return previous;
+        } else {
+            UpdateToken();
+            return previous;
+        }
+    }
+
+    public Token Peek() {
+        if (AtEnd()) {
+            return tokenEOF;
+        } else if (current is TokenEOF) {
+            UpdateToken();
+            return current;
+        } else {
+            return current;
+        }
+    }
+
+    private void UpdateToken() {
+        previous = current;
+        current = ScanToken();
+    }
+
     private Token ScanToken() {
-        throw new NotImplementedException();
+        SkipWhiteSpace();
+        FreshIndex();
+
+        if (AtEnd()) {
+            return tokenEOF;
+        }
+        
+        switch (AdvanceChar()) {
+            case '+':
+                return new TokenOperator(CurrentLocation(), Operator.Add);
+            case '-':
+                return new TokenOperator(CurrentLocation(), Operator.Sub);
+            case '*':
+                return new TokenOperator(CurrentLocation(), Operator.Star);
+            case '/':
+                return new TokenOperator(CurrentLocation(), Operator.Slash);
+            case '=':
+                return new TokenOperator(CurrentLocation(), Operator.Equal);
+            case char ch when IsIdentifierBeginChar(ch):
+                return ScanIdentifier();
+            default:
+                throw new CompileError(CurrentLocation(), $"Unknown character `{PreviousChar()}`");
+        }
     }
 
     private void SkipWhiteSpace() {
@@ -49,37 +101,11 @@ public partial class Lexer {
         }
     }
 
-    private void FreshIndex() {
-        startIdx = currentIdx;
-        startPos = endPos;
-    }
-
-    private void NewLine() {
-        endPos.Line++;
-        endPos.Idx = 0;
-    }
-
-    private char AdvanceChar() {
-        if (currentIdx == source.Length) {
-            return '\0';
-        }
-        currentIdx++;
-        return source[currentIdx - 1];
-    }
-
-    private char PeekChar() {
-        if (currentIdx == source.Length) {
-            return '\0';
-        }
-        return source[currentIdx];
-    }
-
-    private bool MatchChar(char target) {
-        if (PeekChar() == target) {
+    private TokenIdentifier ScanIdentifier() {
+        while (IsIdentifierChar(PeekChar())) {
             AdvanceChar();
-            return true;
-        } else {
-            return false;
         }
+
+        return new(CurrentLocation(), source.Substring(startIdx, currentIdx - startIdx));
     }
 }

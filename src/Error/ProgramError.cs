@@ -1,11 +1,7 @@
 namespace Error;
 
-public class ProgramError(string message) : Exception, ILoxinasError {
-    public override string Message {
-        get => message;
-    }
-
-    public string Type {
+public class ProgramError(string message) : LoxinasError(message) {
+    public override string Type {
         get => "Program Error";
     }
 }

@@ -2,16 +2,12 @@ using Information;
 
 namespace Error;
 
-public class CompileError(Location location, string message) : ILoxinasError {
-    public string Message {
-        get => message;
-    }
-
+public class CompileError(Location location, string message) : LoxinasError(message) {
     public Location Location {
         get => location;
     }
 
-    public string Type {
+    public override string Type {
         get => "Compile Error";
     }
 }

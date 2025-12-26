@@ -1,7 +1,7 @@
 namespace Error;
 
-public class ErrorList(IEnumerable<ILoxinasError> errors) : Exception {
-    public IEnumerable<ILoxinasError> Errors {
+public class ErrorList(IEnumerable<LoxinasError> errors) : Exception {
+    public IEnumerable<LoxinasError> Errors {
         get => errors;
     }
 }
