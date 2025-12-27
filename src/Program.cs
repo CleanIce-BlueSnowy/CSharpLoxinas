@@ -3,6 +3,8 @@ using Compiler;
 using Error;
 
 static class Program {
+    public static string[] sourceLines = [];
+
     private static void Main(string[] args) {
         CommandArgs cmdArgs;
         try {
@@ -15,21 +17,27 @@ static class Program {
             return;
         }
 
-        if (cmdArgs.InputFile is string inputFilePath) {
+        if (cmdArgs.InputFile is not null) {
             string source;
             try {
-                source = ReadFile(inputFilePath);
+                source = ReadFile(cmdArgs.InputFile);
             } catch (ProgramError error) {
                 ErrorHandler.PrintError(error);
                 Environment.Exit(1);
                 return;
             }
 
+            sourceLines = source.Split('\n');
+
             var lexer = new Lexer(source);
             try {
                 while (true) {
                     Token token = lexer.Advance();
-                    Console.WriteLine(token);
+
+                    #if DEBUG
+                    Console.WriteLine(token.DebugInfo());
+                    #endif
+
                     if (token is TokenEOF) {
                         break;
                     }

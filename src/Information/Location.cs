@@ -8,7 +8,7 @@ public record struct Location(Position Start, Position End) {
         if (End.Line != Start.Line) {
             builder.Append($"-{End.Line}");
         }
-        builder.Append($" at {Start.Idx}");
+        builder.Append($" at {Start.Idx + 1}");
         if (End.Idx - 1 != Start.Idx) {
             builder.Append($"-{End.Idx}");
         }
@@ -19,6 +19,6 @@ public record struct Location(Position Start, Position End) {
 
 public record struct Position(int Line, int Idx) {
     public override readonly string ToString() {
-        return $"[line {Line} at {Idx}]";
+        return $"[line {Line} at {Idx + 1}]";
     }
 }

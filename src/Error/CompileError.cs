@@ -6,8 +6,4 @@ public class CompileError(Location location, string message) : LoxinasError(mess
     public Location Location {
         get => location;
     }
-
-    public override string Type {
-        get => "Compile Error";
-    }
 }

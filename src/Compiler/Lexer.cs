@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Error;
 using Information;
 
@@ -14,9 +15,15 @@ public partial class Lexer {
     private Token previous;
     private Token current;
 
+    private static readonly Dictionary<string, Keyword> keywords = new() {
+        ["else"] = Keyword.Else,
+        ["func"] = Keyword.Func,
+        ["if"] = Keyword.If,
+    };
+
     public Lexer(string source) {
         this.source = source;
-        var lines = source.Split();
+        var lines = source.Split('\n');
         var endIdx = lines[^1].Length;
         endLocation = new(new(lines.Length, endIdx), new(lines.Length, endIdx + 1));
         tokenEOF = new(endLocation);
@@ -30,7 +37,8 @@ public partial class Lexer {
 
     public Token Advance() {
         if (AtEnd()) {
-            return tokenEOF;
+            UpdateToken();
+            return previous;
         } else if (current is TokenEOF) {
             UpdateToken();
             UpdateToken();
@@ -64,7 +72,7 @@ public partial class Lexer {
         if (AtEnd()) {
             return tokenEOF;
         }
-        
+
         switch (AdvanceChar()) {
             case '+':
                 return new TokenOperator(CurrentLocation(), Operator.Add);
@@ -75,11 +83,17 @@ public partial class Lexer {
             case '/':
                 return new TokenOperator(CurrentLocation(), Operator.Slash);
             case '=':
-                return new TokenOperator(CurrentLocation(), Operator.Equal);
+                Operator ope;
+                if (MatchChar('=')) {
+                    ope = Operator.EqualEqual;
+                } else {
+                    ope = Operator.Equal;
+                }
+                return new TokenOperator(CurrentLocation(), ope);
             case char ch when IsIdentifierBeginChar(ch):
-                return ScanIdentifier();
+                return ScanName();
             default:
-                throw new CompileError(CurrentLocation(), $"Unknown character `{PreviousChar()}`");
+                throw new CompileError(CurrentLocation(), $"Unknown character `{PreviousChar()}`.");
         }
     }
 
@@ -101,11 +115,17 @@ public partial class Lexer {
         }
     }
 
-    private TokenIdentifier ScanIdentifier() {
+    private Token ScanName() {
         while (IsIdentifierChar(PeekChar())) {
             AdvanceChar();
         }
 
-        return new(CurrentLocation(), source.Substring(startIdx, currentIdx - startIdx));
+        string name = source[startIdx..currentIdx];
+
+        if (keywords.TryGetValue(name, out Keyword keyword)) {
+            return new TokenKeyword(CurrentLocation(), keyword);
+        } else {
+            return new TokenIdentifier(CurrentLocation(), name);
+        }
     }
 }
