@@ -15,7 +15,8 @@ public partial class Lexer {
         return new(startPos, endPos);
     }
 
-    private void FreshIndex() {
+    private void Fresh() {
+        scanningType = ScanningType.None;
         startIdx = currentIdx;
         startPos = endPos;
     }

@@ -5,6 +5,11 @@ using Information;
 namespace Compiler;
 
 public partial class Lexer {
+    private enum ScanningType {
+        None,
+        Identifier,
+    }
+
     private readonly string source;
     private readonly Location endLocation;
     private readonly TokenEOF tokenEOF;
@@ -14,6 +19,7 @@ public partial class Lexer {
     private Position endPos = new(1, 0);
     private Token previous;
     private Token current;
+    private ScanningType scanningType = ScanningType.None;
 
     private static readonly Dictionary<string, Keyword> keywords = new() {
         ["else"] = Keyword.Else,
@@ -60,6 +66,18 @@ public partial class Lexer {
         }
     }
 
+    public void Synchronize() {
+        switch (scanningType) {
+            case ScanningType.None:
+                break;
+            case ScanningType.Identifier:
+                while (IsIdentifierChar(PeekChar())) {
+                    AdvanceChar();
+                }
+                break;
+        }
+    }
+
     private void UpdateToken() {
         previous = current;
         current = ScanToken();
@@ -67,7 +85,7 @@ public partial class Lexer {
 
     private Token ScanToken() {
         SkipWhiteSpace();
-        FreshIndex();
+        Fresh();
 
         if (AtEnd()) {
             return tokenEOF;
@@ -116,6 +134,8 @@ public partial class Lexer {
     }
 
     private Token ScanName() {
+        scanningType = ScanningType.Identifier;
+
         while (IsIdentifierChar(PeekChar())) {
             AdvanceChar();
         }

@@ -30,20 +30,19 @@ static class Program {
             sourceLines = source.Split('\n');
 
             var lexer = new Lexer(source);
-            try {
-                while (true) {
-                    Token token = lexer.Advance();
-
-                    #if DEBUG
-                    Console.WriteLine(token.DebugInfo());
-                    #endif
-
-                    if (token is TokenEOF) {
-                        break;
-                    }
+            while (true) {
+                Token token;
+                try {
+                    token = lexer.Advance();
+                } catch (CompileError error) {
+                    ErrorHandler.PrintError(error);
+                    lexer.Synchronize();
+                    continue;
                 }
-            } catch (CompileError error) {
-                ErrorHandler.PrintError(error);
+                Console.WriteLine(token.DebugInfo());
+                if (token is TokenEOF) {
+                    break;
+                }
             }
         } else {
             Console.WriteLine(LoxinasInfo.Version);
