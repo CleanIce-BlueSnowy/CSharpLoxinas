@@ -1,7 +1,6 @@
 namespace Information;
 
 public enum Keyword {
-
     Else,
     Func,
     If,

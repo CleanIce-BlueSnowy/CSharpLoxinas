@@ -39,7 +39,9 @@ static class Program {
                     lexer.Synchronize();
                     continue;
                 }
+                #if DEBUG
                 Console.WriteLine(token.DebugInfo());
+                #endif
                 if (token is TokenEOF) {
                     break;
                 }
