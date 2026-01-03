@@ -2,7 +2,14 @@ using System.Runtime.InteropServices;
 
 namespace CLI;
 
+/// <summary>
+/// 获取 Loxinas 信息。
+/// </summary>
 public static partial class LoxinasInfo {
+    /// <summary>
+    /// 获取操作系统信息。
+    /// </summary>
+    /// <returns>操作系统信息。</returns>
     private static string GetOSInfo() {
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
             return GetWindowsInfo();
@@ -17,6 +24,10 @@ public static partial class LoxinasInfo {
         }
     }
 
+    /// <summary>
+    /// 获取 Windows 操作系统信息。
+    /// </summary>
+    /// <returns>Windows 操作系统信息。</returns>
     private static string GetWindowsInfo() {
         var osVersion = Environment.OSVersion;
         string osName = "Windows";
@@ -39,6 +50,10 @@ public static partial class LoxinasInfo {
         return $"{osName} {osVersion.Version.Major}.{osVersion.Version.Minor}";
     }
 
+    /// <summary>
+    /// 获取 Linux 操作系统信息。
+    /// </summary>
+    /// <returns>Linux 操作系统信息。</returns>
     private static string GetLinuxInfo() {
         try {
             if (File.Exists("/etc/os-release")) {
@@ -72,6 +87,10 @@ public static partial class LoxinasInfo {
         }
     }
 
+    /// <summary>
+    /// 获取 macOS 操作系统信息。
+    /// </summary>
+    /// <returns>macOS 操作系统信息。</returns>
     private static string GetMacOSInfo() {
         try {
             var startInfo = new System.Diagnostics.ProcessStartInfo {
@@ -91,6 +110,10 @@ public static partial class LoxinasInfo {
         }
     }
 
+    /// <summary>
+    /// 获取架构信息。
+    /// </summary>
+    /// <returns>架构信息。</returns>
     private static string GetArchitecture() {
         return RuntimeInformation.OSArchitecture.ToString().ToLower();
     }
