@@ -6,63 +6,35 @@ namespace Compiler;
 /// <summary>
 /// 词素。
 /// </summary>
-/// <param name="location">位置信息。</param>
-public abstract class Token(Location location) {
-    /// <summary>
-    /// 位置信息。
-    /// </summary>
-    public Location Location {
-        get => location;
-    }
-}
+/// <param name="Location">位置信息。</param>
+public abstract record Token(Location Location);
 
 /// <summary>
 /// EOF 词素，表示文件尾。
 /// </summary>
-/// <param name="location">位置信息（超尾位置）。</param>
-public class TokenEOF(Location location) : Token(location);
+/// <param name="Location">位置信息（超尾位置）。</param>
+public record TokenEOF(Location Location) : Token(Location);
 
 /// <summary>
 /// 操作符词素。
 /// </summary>
-/// <param name="location">位置信息。</param>
-/// <param name="ope">操作符。</param>
-public class TokenOperator(Location location, Operator ope) : Token(location) {
-    /// <summary>
-    /// 操作符。
-    /// </summary>
-    public Operator Operator {
-        get => ope;
-    }
-}
+/// <param name="Location">位置信息。</param>
+/// <param name="Operator">操作符。</param>
+public record TokenOperator(Location Location, Operator Operator) : Token(Location);
 
 /// <summary>
 /// 标识符词素。
 /// </summary>
-/// <param name="location">位置信息。</param>
-/// <param name="name">标识符名称。</param>
-public class TokenIdentifier(Location location, string name) : Token(location) {
-    /// <summary>
-    /// 标识符名称。
-    /// </summary>
-    public string Name {
-        get => name;
-    }
-}
+/// <param name="Location">位置信息。</param>
+/// <param name="Name">标识符名称。</param>
+public record TokenIdentifier(Location Location, string Name) : Token(Location);
 
 /// <summary>
 /// 关键字词素。
 /// </summary>
-/// <param name="location">位置信息。</param>
-/// <param name="keyword">关键字。</param>
-public class TokenKeyword(Location location, Keyword keyword) : Token(location) {
-    /// <summary>
-    /// 关键字。
-    /// </summary>
-    public Keyword Keyword {
-        get => keyword;
-    }
-}
+/// <param name="Location">位置信息。</param>
+/// <param name="Keyword">关键字。</param>
+public record TokenKeyword(Location Location, Keyword Keyword) : Token(Location);
 
 #if DEBUG
 

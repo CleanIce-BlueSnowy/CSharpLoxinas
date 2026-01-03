@@ -5,34 +5,13 @@ namespace Compiler;
 /// <summary>
 /// AST 表达式。
 /// </summary>
-/// <param name="location"位置信息。</param>
-public abstract class Expr(Location location) {
-    /// <summary>
-    /// 位置信息
-    /// </summary>
-    public Location Location {
-        get => location;
-    }
-}
+/// <param name="Location"位置信息。</param>
+public abstract record Expr(Location Location);
 
 /// <summary>
 /// AST 表达式：一元操作符。
 /// </summary>
-/// <param name="location">位置信息。</param>
-/// <param name="ope">操作符。</param>
-/// <param name="rhs">右操作数。</param>
-public class ExprUnary(Location location, Operator ope, Expr rhs): Expr(location) {
-    /// <summary>
-    /// 操作符。
-    /// </summary>
-    public Operator Operator {
-        get => ope;
-    }
-
-    /// <summary>
-    /// 右操作数。
-    /// </summary>
-    public Expr Rhs {
-        get => rhs;
-    }
-}
+/// <param name="Location">位置信息。</param>
+/// <param name="Ope">操作符。</param>
+/// <param name="Rhs">右操作数。</param>
+public record ExprUnary(Location Location, Operator Ope, Expr Rhs): Expr(Location);
