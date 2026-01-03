@@ -88,9 +88,7 @@ public partial class Lexer {
     /// <summary>
     /// 前一个已经扫描过的词素。
     /// </summary>
-    public Token Previous {
-        get => previous;
-    }
+    public Token Previous => previous;
 
     /// <summary>
     /// 消耗词素。

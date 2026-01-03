@@ -47,29 +47,26 @@ public static class TokenExtensionsDebug {
     /// </summary>
     /// <param name="token">词素。</param>
     /// <returns>调试信息的字符串表示。</returns>
-    public static string DebugInfo(this Token token) {
-        return token switch {
-            TokenEOF tokenEOF => PackTokenInfo("EOF", GetInfo(tokenEOF)),
-            TokenOperator tokenOperator => PackTokenInfo("Operator", GetInfo(tokenOperator)),
-            TokenIdentifier tokenIdentifier => PackTokenInfo("Identifier", GetInfo(tokenIdentifier)),
-            TokenKeyword tokenKeyword => PackTokenInfo("Keyword", GetInfo(tokenKeyword)),
-            _ => "## Unknown Token ##",
-        };
-    }
+    public static string DebugInfo(this Token token) => token switch {
+        TokenEOF tokenEOF => PackTokenInfo("EOF", GetInfo(tokenEOF)),
+        TokenOperator tokenOperator => PackTokenInfo("Operator", GetInfo(tokenOperator)),
+        TokenIdentifier tokenIdentifier => PackTokenInfo("Identifier", GetInfo(tokenIdentifier)),
+        TokenKeyword tokenKeyword => PackTokenInfo("Keyword", GetInfo(tokenKeyword)),
+        _ => "## Unknown Token ##",
+    };
 
     /// <summary>
-    /// 包装词素信息，进行格式化。
+    /// 打包词素信息（格式化）。
     /// </summary>
     /// <param name="name">词素名称。</param>
-    /// <param name="info">词素信息。</param>
-    /// <returns>格式化后的字符串。</returns>
-    private static string PackTokenInfo(string name, List<string> info) {
+    /// <param name="infoList">词素信息。</param>
+    /// <returns>打包后的字符串。</returns>
+    private static string PackTokenInfo(string name, List<string> infoList) {
         var builder = new StringBuilder($"Token [{name}] => {{");
-        builder.Append('\n');
-        foreach (string line in info) {
-            builder.Append($"    {line}\n");
+        foreach (string info in infoList) {
+            builder.Append($"\n    {info}");
         }
-        builder.Append('}');
+        builder.Append("\n}");
         return builder.ToString();
     }
 

@@ -8,7 +8,5 @@ public class ErrorList(IEnumerable<LoxinasError> errors) : Exception {
     /// <summary>
     /// 错误列表。
     /// </summary>
-    public IEnumerable<LoxinasError> Errors {
-        get => errors;
-    }
+    public IEnumerable<LoxinasError> Errors => errors;
 }

@@ -11,26 +11,20 @@ public partial class Lexer {
     /// </summary>
     /// <param name="ch">字符</param>
     /// <returns>是/否。</returns>
-    private static bool IsIdentifierBeginChar(char ch) {
-        return char.IsLetter(ch) || ch == '_';
-    }
+    private static bool IsIdentifierBeginChar(char ch) => char.IsLetter(ch) || ch == '_';
 
     /// <summary>
     /// 判断是否为标识符字符。
     /// </summary>
     /// <param name="ch">字符</param>
     /// <returns>是/否。</returns>
-    private static bool IsIdentifierChar(char ch) {
-        return char.IsLetterOrDigit(ch) || ch == '_';
-    }
+    private static bool IsIdentifierChar(char ch) => char.IsLetterOrDigit(ch) || ch == '_';
 
     /// <summary>
     /// 获取当前词素的位置信息。
     /// </summary>
     /// <returns>当前词素的位置信息。</returns>
-    private Location CurrentLocation() {
-        return new(startPos, endPos);
-    }
+    private Location CurrentLocation() => new(startPos, endPos);
 
     /// <summary>
     /// 刷新词素。此方法会重置词素的起始位置信息，对齐到当前扫描位置。
@@ -102,7 +96,5 @@ public partial class Lexer {
     /// 判断是否扫描到源代码结尾。
     /// </summary>
     /// <returns>是/否。</returns>
-    private bool AtEnd() {
-        return currentIdx == source.Length;
-    }
+    private bool AtEnd() => currentIdx == source.Length;
 }

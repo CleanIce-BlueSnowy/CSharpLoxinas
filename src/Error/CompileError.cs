@@ -11,7 +11,5 @@ public class CompileError(Location location, string message) : LoxinasError(mess
     /// <summary>
     /// 位置信息。
     /// </summary>
-    public Location Location {
-        get => location;
-    }
+    public Location Location => location;
 }

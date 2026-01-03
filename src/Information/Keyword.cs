@@ -20,14 +20,12 @@ public static class KeywordExtensionsDebug {
     /// </summary>
     /// <param name="keyword">关键字。</param>
     /// <returns>关键字在调试模式下的字符串表示。</returns>
-    public static string DebugInfo(this Keyword keyword) {
-        return keyword switch {
-            Keyword.Else => "`Else`",
-            Keyword.Func => "`Func`",
-            Keyword.If => "`If`",
-            _ => "## Unknown Keyword ##",
-        };
-    }
+    public static string DebugInfo(this Keyword keyword) => keyword switch {
+        Keyword.Else => "`Else`",
+        Keyword.Func => "`Func`",
+        Keyword.If => "`If`",
+        _ => "## Unknown Keyword ##",
+    };
 }
 
 #endif
