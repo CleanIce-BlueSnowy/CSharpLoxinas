@@ -17,7 +17,7 @@ public partial class Parser {
         while (lexer.Peek() is TokenOperator { Operator: Operator.EqualEqual } ope) {
             lexer.Advance();
             Expr rhs = ExprTerm();
-            lhs = new ExprBinary(Location.Combine(lhs.Location, rhs.Location), ope, lhs, rhs);
+            lhs = new ExprBinary(ope, lhs, rhs);
         }
 
         return lhs;
@@ -33,7 +33,7 @@ public partial class Parser {
         while (lexer.Peek() is TokenOperator { Operator: Operator.Add | Operator.Sub } ope) {
             lexer.Advance();
             Expr rhs = ExprFactor();
-            lhs = new ExprBinary(Location.Combine(lhs.Location, rhs.Location), ope, lhs, rhs);
+            lhs = new ExprBinary(ope, lhs, rhs);
         }
 
         return lhs;
@@ -49,7 +49,7 @@ public partial class Parser {
         while (lexer.Peek() is TokenOperator { Operator: Operator.Star | Operator.Slash } ope) {
             lexer.Advance();
             Expr rhs = ExprUnary();
-            lhs = new ExprBinary(Location.Combine(lhs.Location, rhs.Location), ope, lhs, rhs);
+            lhs = new ExprBinary(ope, lhs, rhs);
         }
 
         return lhs;
@@ -63,7 +63,7 @@ public partial class Parser {
         if (lexer.Peek() is TokenOperator { Operator: Operator.Sub } ope) {
             lexer.Advance();
             Expr rhs = ExprUnary();
-            return new ExprUnary(Location.Combine(ope.Location, rhs.Location), ope, rhs);
+            return new ExprUnary(ope, rhs);
         } else {
             return ExprPrimary();
         }
@@ -77,7 +77,7 @@ public partial class Parser {
         switch (lexer.Peek()) {
             case TokenIdentifier tokenIdentifier:
                 lexer.Advance();
-                return new ExprVariable(tokenIdentifier.Location, tokenIdentifier);
+                return new ExprVariable(tokenIdentifier);
             default:
                 throw new CompileError(lexer.Advance().Location, "Expected an expression.");
         }
