@@ -1,5 +1,6 @@
 ﻿using CLI;
 using Compiler;
+using Debug;
 using Error;
 
 /// <summary>
@@ -12,50 +13,58 @@ static class Program {
     public static string[] sourceLines = [];
 
     /// <summary>
+    /// 命令行参数。
+    /// </summary>
+    public static CommandArgs? CommandArgs = null;
+
+    /// <summary>
     /// 入口点。
     /// </summary>
     /// <param name="args">命令行参数。</param>
     private static void Main(string[] args) {
-        CommandArgs cmdArgs;
         try {
-            cmdArgs = new(args);
+            CommandArgs = new(args);
         } catch (ErrorList errors) {  // 处理错误列表。
             foreach (var error in errors.Errors) {
                 ErrorHandler.PrintError(error);
             }
             Environment.Exit(1);
-            return;  // 阻止“未初始化”的警告。
         }
 
-        if (cmdArgs.InputFile is not null) {
+        if (CommandArgs.InputFile is not null) {
             string source;
             try {
-                source = ReadFile(cmdArgs.InputFile);
+                source = ReadFile(CommandArgs.InputFile);
             } catch (ProgramError error) {
                 ErrorHandler.PrintError(error);
                 Environment.Exit(1);
-                return;
+                return;  // 阻止“未初始化”警告。
             }
 
             sourceLines = source.Split('\n');
 
-            var lexer = new Lexer(source);
-            while (true) {
-                Token token;
-                try {
-                    token = lexer.Advance();
-                } catch (CompileError error) {
-                    ErrorHandler.PrintError(error);
-                    lexer.Synchronize();  // 同步，避免连环错误。
-                    continue;
-                }
-                #if DEBUG
-                Console.WriteLine(token.DebugInfo());
-                #endif
-                if (token is TokenEOF) {
-                    break;
-                }
+            Logging.LogInfo("Start compiling.");
+
+            var parser = new Parser(new(source));
+
+            Expr expr;
+
+            try {
+                expr = parser.ParseExpression();
+            } catch (CompileError error) {
+                ErrorHandler.PrintError(error);
+                return;
             }
+
+            #if DEBUG
+            if (CommandArgs.DebugPrintAst) {
+                Logging.LogDebug("====== The AST ======");
+                Console.WriteLine(AstPrinter.Print(expr));
+                Logging.LogDebug("====== End ======");
+            }
+            #endif
+
+            Logging.LogSuccess("Compiling finished.");
         } else {  // 无给出文件。
             Console.WriteLine(LoxinasInfo.Version);
         }

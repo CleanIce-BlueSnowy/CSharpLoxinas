@@ -17,6 +17,7 @@ public static partial class AstPrinter {
     public static string Print(Expr expr) => expr switch {
         ExprUnary exprUnary => PackInfo("Expr", "Unary", GetInfo(exprUnary)),
         ExprBinary exprBinary => PackInfo("Expr", "Binary", GetInfo(exprBinary)),
+        ExprVariable exprVariable => PackInfo("Expr", "Variable", GetInfo(exprVariable)),
         _ => "## Unknown Expr ##",
     };
 
@@ -37,14 +38,14 @@ public static partial class AstPrinter {
     }
 
     /// <summary>
-    /// 将源字符串进行缩进。
+    /// 将源字符串进行缩进（除第一行外）。
     /// </summary>
     /// <param name="source">源字符串。</param>
     /// <returns>缩进之后的字符串。</returns>
     private static string Indent(string source) {
         string[] lines = source.Split('\n');
-        var builder = new StringBuilder();
-        foreach (string line in lines) {
+        var builder = new StringBuilder(lines[0]);
+        foreach (string line in lines[1..]) {
             if (builder.Length != 0) {
                 builder.Append('\n');
             }

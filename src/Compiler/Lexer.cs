@@ -15,6 +15,7 @@ public partial class Lexer {
         /// 最普通的类型。
         /// </summary>
         None,
+
         /// <summary>
         /// 名称类型，标识符或关键字。
         /// </summary>
@@ -25,38 +26,47 @@ public partial class Lexer {
     /// 源代码。
     /// </summary>
     private readonly string source;
+
     /// <summary>
     /// 源代码超尾位置。
     /// </summary>
     private readonly Location endLocation;
+
     /// <summary>
     /// 统一生成的 EOF 词素。
     /// </summary>
     private readonly TokenEOF tokenEOF;
+
     /// <summary>
     /// 词素扫描起始点，相对于整个源代码字符串。
     /// </summary>
     private int startIdx = 0;
+
     /// <summary>
     /// 即将扫描的字符位置，相对于整个源代码字符串。
     /// </summary>
     private int currentIdx = 0;
+
     /// <summary>
     /// 词素起始位置。
     /// </summary>
     private Position startPos = new(1, 0);
+
     /// <summary>
     /// 词素终止位置。
     /// </summary>
     private Position endPos = new(1, 0);
+
     /// <summary>
     /// 前一个已经扫描过的词素。
     /// </summary>
     private Token previous;
+
     /// <summary>
     /// 即将扫描的词素。
     /// </summary>
     private Token current;
+
     /// <summary>
     /// 正在扫描的词素类型。
     /// </summary>
@@ -95,10 +105,7 @@ public partial class Lexer {
     /// </summary>
     /// <returns>下一个被扫描的词素。若已经到达源代码结尾，则返回 EOF 词素。</returns>
     public Token Advance() {
-        if (AtEnd()) {  // 结尾。
-            UpdateToken();  // 移动 previous 和 current。
-            return previous;
-        } else if (current is TokenEOF) {  // 未开始扫描，需要初始化，进行两次扫描。
+        if (current is TokenEOF) {  // 未开始扫描，需要初始化，进行两次扫描。
             UpdateToken();  // 初始化。
             UpdateToken();  // 消耗扫描。
             return previous;
@@ -113,10 +120,10 @@ public partial class Lexer {
     /// </summary>
     /// <returns>下一个即将被扫描的词素。若已经到达源代码结尾，则返回 EOF 词素。</returns>
     public Token Peek() {
-        if (AtEnd()) {
-            return tokenEOF;
-        } else if (current is TokenEOF) {  // 未开始扫描，需要初始化。
-            UpdateToken();  // 初始化。
+        if (current is TokenEOF) {  // 未开始扫描或已经扫描到结尾。
+            if (!AtEnd()) {
+                UpdateToken();  // 初始化。
+            }
             return current;
         } else {
             return current;

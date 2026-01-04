@@ -1,3 +1,4 @@
+using CLI;
 using Information;
 
 namespace Error;
@@ -11,6 +12,7 @@ public static class ErrorHandler {
     /// </summary>
     /// <param name="error">Loxinas 错误。</param>
     public static void PrintError(LoxinasError error) {
+        Console.ForegroundColor = ConsoleColor.Red;
         switch (error) {
             case ProgramError programError:
                 PrintProgramError(programError);
@@ -19,6 +21,7 @@ public static class ErrorHandler {
                 PrintCompileError(compileError);
                 break;
         }
+        Console.ResetColor();
     }
 
     /// <summary>
@@ -45,7 +48,7 @@ public static class ErrorHandler {
     /// <param name="name">名称。</param>
     /// <param name="error">Loxinas 错误。</param>
     private static void PrintNamedError(string name, LoxinasError error) {
-        Console.WriteLine($"{name}: {error.Message}");
+        Logging.LogError($"{name}: {error.Message}");
     }
 
     /// <summary>
