@@ -18,6 +18,7 @@ public static partial class AstPrinter {
         ExprUnary exprUnary => PackInfo("Expr", "Unary", GetInfo(exprUnary)),
         ExprBinary exprBinary => PackInfo("Expr", "Binary", GetInfo(exprBinary)),
         ExprVariable exprVariable => PackInfo("Expr", "Variable", GetInfo(exprVariable)),
+        ExprLiteral exprLiteral => PackInfo("Expr", "Literal", GetInfo(exprLiteral)),
         _ => "## Unknown Expr ##",
     };
 

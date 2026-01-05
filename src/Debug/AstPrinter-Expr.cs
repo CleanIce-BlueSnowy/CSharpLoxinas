@@ -33,10 +33,27 @@ public static partial class AstPrinter {
         return info;
     }
 
+    /// <summary>
+    /// 获取变量表达式信息。
+    /// </summary>
+    /// <param name="expr">变量表达式。</param>
+    /// <returns>表达式信息。</returns>
     private static List<string> GetInfo(ExprVariable expr) {
         List<string> info = [];
         info.Add($"Location: {expr.Location}");
         info.Add($"Name: {Indent(expr.Name.DebugInfo())}");
+        return info;
+    }
+
+    /// <summary>
+    /// 获取字面量表达式信息。
+    /// </summary>
+    /// <param name="expr">字面量表达式。</param>
+    /// <returns>表达式信息。</returns>
+    private static List<string> GetInfo(ExprLiteral expr) {
+        List<string> info = [];
+        info.Add($"Location: {expr.Location}");
+        info.Add($"Value: {expr.Value.DebugInfo()}");
         return info;
     }
 }

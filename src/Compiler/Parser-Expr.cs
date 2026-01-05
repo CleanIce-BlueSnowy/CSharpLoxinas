@@ -108,6 +108,17 @@ public partial class Parser {
 
                 lexer.Advance();
                 return new ExprVariable(tokenIdentifier);
+
+            case TokenNumber { Value: Value value } tokenNumber:
+                #if DEBUG
+                if (Program.CommandArgs!.DebugPrintToken) {
+                    Console.WriteLine(lexer.Peek().DebugInfo());
+                }
+                #endif
+
+                lexer.Advance();
+                return new ExprLiteral(tokenNumber, value);
+                
             default:
                 throw new CompileError(lexer.Advance().Location, "Expected an expression.");
         }

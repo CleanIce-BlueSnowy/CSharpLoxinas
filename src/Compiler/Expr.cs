@@ -7,7 +7,10 @@ namespace Compiler;
 /// </summary>
 /// <param name="Location"位置信息。</param>
 public abstract record Expr {
-    public virtual Location Location { get; }
+    /// <summary>
+    /// 位置信息。
+    /// </summary>
+    public abstract Location Location { get; }
 }
 
 /// <summary>
@@ -27,6 +30,15 @@ public record ExprUnary(TokenOperator Operator, Expr Rhs): Expr {
 /// <param name="Rhs">右操作数。</param>
 public record ExprBinary(TokenOperator Operator, Expr Lhs, Expr Rhs): Expr {
     public override Location Location => Location.Combine(Lhs.Location, Rhs.Location);
+}
+
+/// <summary>
+/// AST 表达式：字面量。
+/// </summary>
+/// <param name="Token">词素。</param>
+/// <param name="Value">值。</param>
+public record ExprLiteral(Token Token, Value Value): Expr {
+    public override Location Location => Token.Location;
 }
 
 /// <summary>

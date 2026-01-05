@@ -36,6 +36,13 @@ public record TokenIdentifier(Location Location, string Name) : Token(Location);
 /// <param name="Keyword">关键字。</param>
 public record TokenKeyword(Location Location, Keyword Keyword) : Token(Location);
 
+/// <summary>
+/// 数字词素。
+/// </summary>
+/// <param name="Location">位置信息。</param>
+/// <param name="Value"数值</param>
+public record TokenNumber(Location Location, Value Value) : Token(Location);
+
 #if DEBUG
 
 /// <summary>
@@ -48,20 +55,21 @@ public static class TokenExtensionsDebug {
     /// <param name="token">词素。</param>
     /// <returns>调试信息的字符串表示。</returns>
     public static string DebugInfo(this Token token) => token switch {
-        TokenEOF tokenEOF => PackTokenInfo("EOF", GetInfo(tokenEOF)),
-        TokenOperator tokenOperator => PackTokenInfo("Operator", GetInfo(tokenOperator)),
-        TokenIdentifier tokenIdentifier => PackTokenInfo("Identifier", GetInfo(tokenIdentifier)),
-        TokenKeyword tokenKeyword => PackTokenInfo("Keyword", GetInfo(tokenKeyword)),
+        TokenEOF tokenEOF => PackInfo("EOF", GetInfo(tokenEOF)),
+        TokenOperator tokenOperator => PackInfo("Operator", GetInfo(tokenOperator)),
+        TokenIdentifier tokenIdentifier => PackInfo("Identifier", GetInfo(tokenIdentifier)),
+        TokenKeyword tokenKeyword => PackInfo("Keyword", GetInfo(tokenKeyword)),
+        TokenNumber tokenNumber => PackInfo("Number", GetInfo(tokenNumber)),
         _ => "## Unknown Token ##",
     };
 
     /// <summary>
-    /// 打包词素信息（格式化）。
+    /// 包装词素信息（格式化）。
     /// </summary>
     /// <param name="name">词素名称。</param>
     /// <param name="infoList">词素信息。</param>
-    /// <returns>打包后的字符串。</returns>
-    private static string PackTokenInfo(string name, List<string> infoList) {
+    /// <returns>包装后的字符串。</returns>
+    private static string PackInfo(string name, List<string> infoList) {
         var builder = new StringBuilder($"Token [{name}] => {{");
         foreach (string info in infoList) {
             builder.Append($"\n    {info}");
@@ -114,6 +122,18 @@ public static class TokenExtensionsDebug {
         List<string> info = [];
         info.Add($"Location: {token.Location}");
         info.Add($"Keyword: {token.Keyword.DebugInfo()}");
+        return info;
+    }
+
+    /// <summary>
+    /// 获取数字词素信息。
+    /// </summary>
+    /// <param name="token">数字词素。</param>
+    /// <returns>词素信息。</returns>
+    private static List<string> GetInfo(TokenNumber token) {
+        List<string> info = [];
+        info.Add($"Location: {token.Location}");
+        info.Add($"Value: {token.Value.DebugInfo()}");
         return info;
     }
 }

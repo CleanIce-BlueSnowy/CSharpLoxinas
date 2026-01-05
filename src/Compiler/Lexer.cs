@@ -20,6 +20,11 @@ public partial class Lexer {
         /// 名称类型，标识符或关键字。
         /// </summary>
         Identifier,
+
+        /// <summary>
+        /// 数值类型。
+        /// </summary>
+        Number,
     }
 
     /// <summary>
@@ -186,6 +191,8 @@ public partial class Lexer {
                 return new TokenOperator(CurrentLocation(), ope);
             case char ch when IsIdentifierBeginChar(ch):
                 return ScanName();
+            case char ch when char.IsDigit(ch):
+                return ScanNumber();
             default:
                 throw new CompileError(CurrentLocation(), $"Unknown character `{PreviousChar()}`.");
         }
@@ -230,5 +237,21 @@ public partial class Lexer {
         } else {
             return new TokenIdentifier(CurrentLocation(), name);
         }
+    }
+
+    /// <summary>
+    /// 扫描数字词素。
+    /// </summary>
+    /// <returns>数字词素。</returns>
+    private Token ScanNumber() {
+        scanningType = ScanningType.Number;
+
+        while (char.IsDigit(PeekChar())) {
+            AdvanceChar();
+        }
+
+        string number = source[startIdx..currentIdx];
+
+        return new TokenNumber(CurrentLocation(), new ValueInt32(int.Parse(number)));
     }
 }
