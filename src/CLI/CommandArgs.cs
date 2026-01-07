@@ -21,6 +21,16 @@ public class CommandArgs {
     /// 是否在调试模式下启用语法树打印。
     /// </summary>
     public readonly bool DebugPrintAst;
+
+    /// <summary>
+    /// 是否在调试模式下启用抽象指令打印。
+    /// </summary>
+    public readonly bool DebugPrintInst;
+
+    /// <summary>
+    /// 是否在调试模式下启用中间代码打印。
+    /// </summary>
+    public readonly bool DebugPrintIrCode;
     #endif  // ====== DEBUG END ======
 
     /// <summary>
@@ -42,6 +52,20 @@ public class CommandArgs {
                 case "-debug-print-ast" or "-debug-pa":
                     #if DEBUG
                     DebugPrintAst = true;
+                    #else
+                    exceptions.Add(new($"Argument `{arg}` must be used in loxinas debug mode."));
+                    #endif
+                    break;
+                case "-debug-print-instruction" or "-debug-print-inst" or "-debug-pi":
+                    #if DEBUG
+                    DebugPrintInst = true;
+                    #else
+                    exceptions.Add(new($"Argument `{arg}` must be used in loxinas debug mode."));
+                    #endif
+                    break;
+                case "-debug-print-ircode" or "-debug-pc":
+                    #if DEBUG
+                    DebugPrintIrCode = true;
                     #else
                     exceptions.Add(new($"Argument `{arg}` must be used in loxinas debug mode."));
                     #endif

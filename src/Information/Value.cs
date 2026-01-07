@@ -1,15 +1,23 @@
+using System.Diagnostics;
+
 namespace Information;
 
 /// <summary>
 /// Loxinas 值（编译期使用）。
 /// </summary>
-public abstract record Value;
+public interface IValue;
 
 /// <summary>
 /// Loxinas 32 位有符号整数值（编译期使用）。
 /// </summary>
 /// <param name="Value">数值。</param>
-public record ValueInt32(int Value) : Value;
+public record struct ValueInt32(int Value) : IValue;
+
+/// <summary>
+/// Loxinas 64 位双精度浮点值（编译期使用）。
+/// </summary>
+/// <param name="Value">数值。</param>
+public record struct ValueFloat64(double Value): IValue;
 
 #if DEBUG
 
@@ -22,9 +30,11 @@ public static class ValueExtendDebug {
     /// </summary>
     /// <param name="value">值。</param>
     /// <returns>调试信息。</returns>
-    public static string DebugInfo(this Value value) => value switch {
-        ValueInt32 { Value: int valueInt32 } => PackInfo("Int32", valueInt32.ToString()),
-        _ => "## Unknown Value ##",
+    /// <exception cref="UnreachableException"></exception>
+    public static string DebugInfo(this IValue value) => value switch {
+        ValueInt32(int val) => PackInfo("Int32", val.ToString()),
+        ValueFloat64(double val) => PackInfo("Float64", val.ToString()),
+        _ => throw new UnreachableException(),
     };
 
     /// <summary>

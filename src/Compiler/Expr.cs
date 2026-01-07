@@ -37,7 +37,7 @@ public record ExprBinary(TokenOperator Operator, Expr Lhs, Expr Rhs): Expr {
 /// </summary>
 /// <param name="Token">词素。</param>
 /// <param name="Value">值。</param>
-public record ExprLiteral(Token Token, Value Value): Expr {
+public record ExprLiteral(Token Token, IValue Value): Expr {
     public override Location Location => Token.Location;
 }
 

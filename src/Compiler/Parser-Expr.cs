@@ -14,7 +14,7 @@ public partial class Parser {
     private Expr ExprEquality() {
         Expr lhs = ExprTerm();
 
-        while (lexer.Peek() is TokenOperator { Operator: Operator.EqualEqual } ope) {
+        while (lexer.Peek() is TokenOperator(_, Operator: Operator.EqualEqual) ope) {
             #if DEBUG
             if (Program.CommandArgs!.DebugPrintToken) {
                 Console.WriteLine(ope.DebugInfo());
@@ -36,7 +36,7 @@ public partial class Parser {
     private Expr ExprTerm() {
         Expr lhs = ExprFactor();
 
-        while (lexer.Peek() is TokenOperator { Operator: Operator.Add or Operator.Sub } ope) {
+        while (lexer.Peek() is TokenOperator(_, Operator: Operator.Add or Operator.Sub) ope) {
             #if DEBUG
             if (Program.CommandArgs!.DebugPrintToken) {
                 Console.WriteLine(ope.DebugInfo());
@@ -58,7 +58,7 @@ public partial class Parser {
     private Expr ExprFactor() {
         Expr lhs = ExprUnary();
 
-        while (lexer.Peek() is TokenOperator { Operator: Operator.Star or Operator.Slash } ope) {
+        while (lexer.Peek() is TokenOperator(_, Operator: Operator.Star or Operator.Slash) ope) {
             #if DEBUG
             if (Program.CommandArgs!.DebugPrintToken) {
                 Console.WriteLine(ope.DebugInfo());
@@ -78,7 +78,7 @@ public partial class Parser {
     /// </summary>
     /// <returns></returns>
     private Expr ExprUnary() {
-        if (lexer.Peek() is TokenOperator { Operator: Operator.Sub } ope) {
+        if (lexer.Peek() is TokenOperator(_, Operator: Operator.Sub) ope) {
             #if DEBUG
             if (Program.CommandArgs!.DebugPrintToken) {
                 Console.WriteLine(ope.DebugInfo());
@@ -109,7 +109,7 @@ public partial class Parser {
                 lexer.Advance();
                 return new ExprVariable(tokenIdentifier);
 
-            case TokenNumber { Value: Value value } tokenNumber:
+            case TokenNumber(_, Value: IValue value) tokenNumber:
                 #if DEBUG
                 if (Program.CommandArgs!.DebugPrintToken) {
                     Console.WriteLine(lexer.Peek().DebugInfo());
@@ -118,7 +118,22 @@ public partial class Parser {
 
                 lexer.Advance();
                 return new ExprLiteral(tokenNumber, value);
-                
+
+            case TokenOperator(_, Operator: Operator.LeftParen):
+                #if DEBUG
+                if (Program.CommandArgs!.DebugPrintToken) {
+                    Console.WriteLine(lexer.Peek().DebugInfo());
+                }
+                #endif
+
+                lexer.Advance();
+                Expr expr = ParseExpression();
+                if (lexer.Peek() is not TokenOperator { Operator: Operator.RightParen }) {
+                    throw new CompileError(lexer.Advance().Location, "Expected `)` after the expression.");
+                }
+                lexer.Advance();
+                return expr;
+
             default:
                 throw new CompileError(lexer.Advance().Location, "Expected an expression.");
         }

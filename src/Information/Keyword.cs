@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Information;
 
 /// <summary>
@@ -20,11 +22,12 @@ public static class KeywordExtensionsDebug {
     /// </summary>
     /// <param name="keyword">关键字。</param>
     /// <returns>关键字在调试模式下的字符串表示。</returns>
+    /// <exception cref="UnreachableException"></exception>
     public static string DebugInfo(this Keyword keyword) => keyword switch {
         Keyword.Else => "`Else`",
         Keyword.Func => "`Func`",
         Keyword.If => "`If`",
-        _ => "## Unknown Keyword ##",
+        _ => throw new UnreachableException(),
     };
 }
 

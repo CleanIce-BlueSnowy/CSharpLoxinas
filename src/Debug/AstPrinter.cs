@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Compiler;
 
@@ -14,12 +15,13 @@ public static partial class AstPrinter {
     /// </summary>
     /// <param name="expr">表达式。</param>
     /// <returns>打印结果。</returns>
+    /// <exception cref="UnreachableException"></exception>
     public static string Print(Expr expr) => expr switch {
         ExprUnary exprUnary => PackInfo("Expr", "Unary", GetInfo(exprUnary)),
         ExprBinary exprBinary => PackInfo("Expr", "Binary", GetInfo(exprBinary)),
         ExprVariable exprVariable => PackInfo("Expr", "Variable", GetInfo(exprVariable)),
         ExprLiteral exprLiteral => PackInfo("Expr", "Literal", GetInfo(exprLiteral)),
-        _ => "## Unknown Expr ##",
+        _ => throw new UnreachableException(),
     };
 
     /// <summary>

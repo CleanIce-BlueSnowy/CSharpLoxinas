@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Information;
 
@@ -41,7 +42,7 @@ public record TokenKeyword(Location Location, Keyword Keyword) : Token(Location)
 /// </summary>
 /// <param name="Location">位置信息。</param>
 /// <param name="Value"数值</param>
-public record TokenNumber(Location Location, Value Value) : Token(Location);
+public record TokenNumber(Location Location, IValue Value) : Token(Location);
 
 #if DEBUG
 
@@ -54,13 +55,14 @@ public static class TokenExtensionsDebug {
     /// </summary>
     /// <param name="token">词素。</param>
     /// <returns>调试信息的字符串表示。</returns>
+    /// <exception cref="UnreachableException"></exception>
     public static string DebugInfo(this Token token) => token switch {
         TokenEOF tokenEOF => PackInfo("EOF", GetInfo(tokenEOF)),
         TokenOperator tokenOperator => PackInfo("Operator", GetInfo(tokenOperator)),
         TokenIdentifier tokenIdentifier => PackInfo("Identifier", GetInfo(tokenIdentifier)),
         TokenKeyword tokenKeyword => PackInfo("Keyword", GetInfo(tokenKeyword)),
         TokenNumber tokenNumber => PackInfo("Number", GetInfo(tokenNumber)),
-        _ => "## Unknown Token ##",
+        _ => throw new UnreachableException(),
     };
 
     /// <summary>

@@ -164,7 +164,7 @@ public partial class Lexer {
     /// <returns>新被扫描的词素。</returns>
     /// <exception cref="CompileError"></exception>
     private Token ScanToken() {
-        /// 先过滤空白再刷新位置。
+        // 先过滤空白再刷新位置。
         SkipWhiteSpace();
         Fresh();
 
@@ -189,6 +189,10 @@ public partial class Lexer {
                     ope = Operator.Equal;
                 }
                 return new TokenOperator(CurrentLocation(), ope);
+            case '(':
+                return new TokenOperator(CurrentLocation(), Operator.LeftParen);
+            case ')':
+                return new TokenOperator(CurrentLocation(), Operator.RightParen);
             case char ch when IsIdentifierBeginChar(ch):
                 return ScanName();
             case char ch when char.IsDigit(ch):
@@ -243,15 +247,23 @@ public partial class Lexer {
     /// 扫描数字词素。
     /// </summary>
     /// <returns>数字词素。</returns>
-    private Token ScanNumber() {
+    private TokenNumber ScanNumber() {
         scanningType = ScanningType.Number;
 
         while (char.IsDigit(PeekChar())) {
             AdvanceChar();
         }
-
-        string number = source[startIdx..currentIdx];
-
-        return new TokenNumber(CurrentLocation(), new ValueInt32(int.Parse(number)));
+        IValue value;
+        if (MatchChar('.')) {
+            while (char.IsDigit(PeekChar())) {
+                AdvanceChar();
+            }
+            string numString = source[startIdx..currentIdx];
+            value = new ValueFloat64(double.Parse(numString));
+        } else {
+            string numString = source[startIdx..currentIdx];
+            value = new ValueInt32(int.Parse(numString));
+        }
+        return new TokenNumber(CurrentLocation(), value);
     }
 }

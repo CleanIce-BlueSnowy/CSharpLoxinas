@@ -64,6 +64,26 @@ static class Program {
             }
             #endif
 
+            Logging.LogSuccess("Parsing finished.");
+
+            var compiler = new IrCompiler();
+            compiler.CompileExpression(expr);
+
+            #if DEBUG
+            if (CommandArgs.DebugPrintInst) {
+                Logging.LogDebug("====== Instructions ======");
+                compiler.PrintInstructions();
+                Logging.LogDebug("====== End ======");
+            }
+            if (CommandArgs.DebugPrintIrCode) {
+                Logging.LogDebug("====== IR Code ======");
+                foreach (byte code in compiler.IrCodeBytes) {
+                    Console.WriteLine($"{code:X2}");
+                }
+                Logging.LogDebug("====== End ======");
+            }
+            #endif
+
             Logging.LogSuccess("Compiling finished.");
         } else {  // 无给出文件。
             Console.WriteLine(LoxinasInfo.Version);
