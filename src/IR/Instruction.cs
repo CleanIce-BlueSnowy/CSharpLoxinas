@@ -3,7 +3,7 @@ using System.Text;
 using Bytes;
 using Information;
 
-namespace Compiler;
+namespace IR;
 
 /// <summary>
 /// Loxinas 抽象指令。

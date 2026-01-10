@@ -114,7 +114,5 @@ public static partial class LoxinasInfo {
     /// 获取架构信息。
     /// </summary>
     /// <returns>架构信息。</returns>
-    private static string GetArchitecture() {
-        return RuntimeInformation.OSArchitecture.ToString().ToLower();
-    }
+    private static string GetArchitecture() => RuntimeInformation.OSArchitecture.ToString().ToLower();
 }

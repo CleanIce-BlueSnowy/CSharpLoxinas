@@ -28,9 +28,7 @@ public static class ErrorHandler {
     /// 打印 Loxinas 编译器程序错误。
     /// </summary>
     /// <param name="error">程序错误。</param>
-    private static void PrintProgramError(ProgramError error) {
-        PrintNamedError("Program Error", error);
-    }
+    private static void PrintProgramError(ProgramError error) => PrintNamedError("Program Error", error);
 
     /// <summary>
     /// 打印 Loxinas 编译错误。
@@ -47,9 +45,7 @@ public static class ErrorHandler {
     /// </summary>
     /// <param name="name">名称。</param>
     /// <param name="error">Loxinas 错误。</param>
-    private static void PrintNamedError(string name, LoxinasError error) {
-        Logging.LogError($"{name}: {error.Message}");
-    }
+    private static void PrintNamedError(string name, LoxinasError error) => Logging.LogError($"{name}: {error.Message}");
 
     /// <summary>
     /// 打印位置信息的源代码提示。

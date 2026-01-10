@@ -1,9 +1,9 @@
 namespace Bytes;
 
 /// <summary>
-/// 添加转化为字节数组的支持。
+/// 添加字节转换的支持。
 /// </summary>
-public static class ByteConvert {
+public static partial class ByteConvert {
     /// <summary>
     /// 转换为小端法字节序列。
     /// </summary>

@@ -1,6 +1,6 @@
 using Bytes;
 
-namespace Compiler;
+namespace IR;
 
 /// <summary>
 /// 中间代码——底层二进制指令。
@@ -8,6 +8,7 @@ namespace Compiler;
 public enum IrCode : ushort {
     Constant32,
     Constant64,
+    MAX_VALID = Constant64,
 }
 
 /// <summary>
