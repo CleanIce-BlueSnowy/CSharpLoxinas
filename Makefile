@@ -1,6 +1,6 @@
 .PHONY: build-release build-debug run-release run-debug
 
-ARGS ?= ""
+ARGS ?=
 
 build-release:
 	dotnet build -c Release

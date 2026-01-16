@@ -7,7 +7,7 @@ public static partial class LoxinasInfo {
     /// <summary>
     /// 版本号。
     /// </summary>
-    private static readonly string version = "0.0.1-alpha";
+    private const string version = "0.0.1-alpha";
 
     /// <summary>
     /// 版本信息。

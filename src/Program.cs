@@ -2,6 +2,7 @@
 using Compiler;
 using Debug;
 using Error;
+using IR;
 
 /// <summary>
 /// 主程序。
@@ -23,71 +24,150 @@ static class Program {
     /// <param name="args">命令行参数。</param>
     private static void Main(string[] args) {
         try {
-            CommandArgs = new(args);
-        } catch (ErrorList errors) {  // 处理错误列表。
-            foreach (var error in errors.Errors) {
-                ErrorHandler.PrintError(error);
-            }
-            Environment.Exit(1);
-        }
-
-        if (CommandArgs.InputFile is not null) {
-            string source;
             try {
-                source = ReadFile(CommandArgs.InputFile);
-            } catch (ProgramError error) {
-                ErrorHandler.PrintError(error);
-                Environment.Exit(1);
-                return;  // 阻止“未初始化”警告。
-            }
-
-            sourceLines = source.Split('\n');
-
-            Logging.LogInfo("Start compiling.");
-
-            var parser = new Parser(new(source));
-
-            Expr expr;
-
-            try {
-                expr = parser.ParseExpression();
-            } catch (CompileError error) {
-                ErrorHandler.PrintError(error);
-                return;
-            }
-
-            #if DEBUG
-            if (CommandArgs.DebugPrintAst) {
-                Logging.LogDebug("====== The AST ======");
-                Console.WriteLine(AstPrinter.Print(expr));
-                Logging.LogDebug("====== End ======");
-            }
-            #endif
-
-            Logging.LogSuccess("Parsing finished.");
-
-            var compiler = new IrCompiler();
-            compiler.CompileExpression(expr);
-
-            #if DEBUG
-            if (CommandArgs.DebugPrintInst) {
-                Logging.LogDebug("====== Instructions ======");
-                compiler.PrintInstructions();
-                Logging.LogDebug("====== End ======");
-            }
-            if (CommandArgs.DebugPrintIrCode) {
-                Logging.LogDebug("====== IR Code ======");
-                foreach (byte code in compiler.IrCodeBytes) {
-                    Console.WriteLine($"{code:X2}");
+                CommandArgs = new(args);
+            } catch (ErrorList errors) {  // 处理错误列表。
+                foreach (var error in errors.Errors) {
+                    ErrorHandler.PrintError(error);
                 }
-                Logging.LogDebug("====== End ======");
+                Environment.Exit(1);
             }
-            #endif
 
-            Logging.LogSuccess("Compiling finished.");
-        } else {  // 无给出文件。
-            Console.WriteLine(LoxinasInfo.Version);
+            if (CommandArgs.InputFile is not null) {
+                string extName = Path.GetExtension(CommandArgs.InputFile);
+                string otherName = Path.Combine(Path.GetDirectoryName(CommandArgs.InputFile) ?? "", Path.GetFileNameWithoutExtension(CommandArgs.InputFile));
+                if (!CommandArgs.SetMode) {
+                    switch (extName.ToLower()) {
+                        case LoxinasInfo.SourceCodeExt:
+                            CommandArgs.Compile = true;
+                            break;
+                        case LoxinasInfo.IrCodeExt:
+                            CommandArgs.Disassemble = true;
+                            break;
+                        default:
+                            throw new ProgramError($"Cannot infer the compiler mode from input file: Unknown extension `{extName}`.");
+                    }
+                }
+
+                if (CommandArgs.Compile) {
+                    CommandArgs.OutputFile ??= otherName + LoxinasInfo.IrCodeExt;
+                    if (!CommandArgs.OutputFile.EndsWith(LoxinasInfo.IrCodeExt, StringComparison.OrdinalIgnoreCase)) {
+                        CommandArgs.OutputFile += LoxinasInfo.IrCodeExt;
+                    }
+                } else if (CommandArgs.Disassemble) {
+                    if (CommandArgs.OutputFile is not null && !CommandArgs.OutputFile.EndsWith(LoxinasInfo.DisasmCodeExt, StringComparison.OrdinalIgnoreCase)) {
+                        CommandArgs.OutputFile += LoxinasInfo.DisasmCodeExt;
+                    }
+                }
+
+                if (CommandArgs.Compile) {
+                    Compile();
+                } else if (CommandArgs.Disassemble) {
+                    Disassemble();
+                }
+            } else {  // 无给出文件。
+                Console.WriteLine(LoxinasInfo.Version);
+            }
+        } catch (ProgramError error) {
+            ErrorHandler.PrintError(error);
+            Environment.Exit(2);
         }
+    }
+
+    /// <summary>
+    /// 编译源代码。
+    /// </summary>
+    /// <exception cref="ProgramError"></exception>
+    private static void Compile() {
+        string source;
+        try {
+            source = ReadFile(CommandArgs!.InputFile!);
+        } catch (ProgramError error) {
+            ErrorHandler.PrintError(error);
+            Environment.Exit(1);
+            return;  // 阻止“未初始化”警告。
+        }
+
+        sourceLines = source.Split('\n');
+
+        Logging.LogInfo("Start compiling.");
+
+        var parser = new Parser(new(source));
+
+        Expr expr;
+
+        try {
+            expr = parser.ParseExpression();
+        } catch (CompileError error) {
+            ErrorHandler.PrintError(error);
+            return;
+        }
+
+        #if DEBUG
+        if (CommandArgs.DebugPrintAst) {
+            Logging.LogDebug("====== The AST ======");
+            Console.WriteLine(AstPrinter.Print(expr));
+            Logging.LogDebug("====== End ======");
+        }
+        #endif
+
+        Logging.LogSuccess("Parsing finished.");
+
+        var compiler = new IrCompiler();
+        compiler.CompileExpression(expr);
+
+        #if DEBUG
+        if (CommandArgs.DebugPrintInst) {
+            Logging.LogDebug("====== Instructions ======");
+            compiler.PrintInstructions();
+            Logging.LogDebug("====== End ======");
+        }
+        #endif
+
+        try {
+            File.WriteAllBytes(CommandArgs!.OutputFile!, compiler.IrCodeBytes);
+        } catch (Exception exc) {
+            throw new ProgramError($"Cannot write file: {exc.Message}");
+        }
+
+        Logging.LogSuccess("Compiling finished.");
+    }
+
+    /// <summary>
+    /// 反汇编中间代码。
+    /// </summary>
+    private static void Disassemble() {
+        byte[] bytes;
+        try {
+            bytes = File.ReadAllBytes(CommandArgs!.InputFile!);
+        } catch (Exception exc) {
+            throw new ProgramError($"Cannot read file: {exc.Message}");
+        }
+
+        Logging.LogInfo("Start diassembling.");
+
+        var disasm = new Disassembler(bytes);
+
+        string asm;
+        try {
+            asm = disasm.Disasm();
+        } catch (DisassemblerError error) {
+            ErrorHandler.PrintError(error);
+            Environment.Exit(1);
+            return;
+        }
+
+        if (CommandArgs!.OutputFile is null) {
+            Console.WriteLine(asm);
+        } else {
+            try {
+                File.WriteAllText(CommandArgs!.OutputFile, asm);
+            } catch (Exception exc) {
+                throw new ProgramError($"Cannot write file: {exc.Message}");
+            }
+        }
+
+        Logging.LogSuccess("Disassembling finished.");
     }
 
     /// <summary>
