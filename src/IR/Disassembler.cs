@@ -31,6 +31,7 @@ public class Disassembler(byte[] bytes) {
 
         while (!IsAtEnd()) {
             result.Append(DisasmCode());
+            result.Append('\n');
         }
 
         return result.ToString();
@@ -40,21 +41,24 @@ public class Disassembler(byte[] bytes) {
     /// 反汇编单个指令
     /// </summary>
     /// <returns></returns>
-    /// <exception cref="DisassemblerError"></exception>
+    /// <exception cref="DisassembleError"></exception>
     /// <exception cref="UnreachableException"></exception>
     private string DisasmCode() {
         OffsetCheck(2);
 
+        int oldOffset = offset;
+
         ushort code = bytes[offset..(offset + 2)].ToUShort();
         if (code >= (ushort)IrCode.MAX_VALID) {
-            throw new DisassemblerError($"[At {OffsetToString()}] Unknown IR Code: {code:04X} ({code}).");
+            throw new DisassembleError($"[At {OffsetToString()}] Unknown IR Code: {code:X4} ({code}).");
         }
         offset += 2;
         IrCode irCode = (IrCode)code;
 
         return irCode switch {
-            IrCode.Constant32 => PackCode("Constant", "4 Bytes", [DisasmValue32()]),
-            IrCode.Constant64 => PackCode("Constant", "8 Bytes", [DisasmValue64()]),
+            IrCode.Constant32 => PackCode(oldOffset, "Constant", "4 Bytes", [DisasmValue32()]),
+            IrCode.Constant64 => PackCode(oldOffset, "Constant", "8 Bytes", [DisasmValue64()]),
+            IrCode.IAdd32 => PackCode(oldOffset, "IAdd", "4 Bytes", []),
             _ => throw new UnreachableException(),
         };
     }
@@ -69,7 +73,7 @@ public class Disassembler(byte[] bytes) {
         uint value = bytes[offset..(offset + 4)].ToUInt();
         offset += 4;
 
-        return $"{value:08X} ({value})";
+        return $"{value:X8} ({value})";
     }
 
     /// <summary>
@@ -82,7 +86,7 @@ public class Disassembler(byte[] bytes) {
         ulong value = bytes[offset..(offset + 8)].ToULong();
         offset += 8;
 
-        return $"{value:016X} ({value})";
+        return $"{value:X16} ({value})";
     }
 
     /// <summary>
@@ -92,8 +96,9 @@ public class Disassembler(byte[] bytes) {
     /// <param name="extra">指令额外信息。</param>
     /// <param name="args">指令参数。</param>
     /// <returns>打包后的字符串。</returns>
-    private static string PackCode(string name, string? extra, List<string> args) {
-        var builder = new StringBuilder($"{name:15}");
+    private static string PackCode(int oldOffset, string name, string? extra, List<string> args) {
+        var builder = new StringBuilder($"{oldOffset:X8}    ");
+        builder.Append(name.PadRight(15));
         if (extra is not null) {
             builder.Append($" [{extra.CenterAlign(13)}]  ");
         } else {
@@ -109,16 +114,16 @@ public class Disassembler(byte[] bytes) {
     /// 将偏移量转换为字符串表示。
     /// </summary>
     /// <returns>字符串表示。</returns>
-    private string OffsetToString() => $"{offset:08X}";
+    private string OffsetToString() => $"{offset:X8}";
 
     /// <summary>
     /// 检查目前偏移量位置之后是否有足够的字节可以读取。如果没有，则报错。
     /// </summary>
     /// <param name="consume">需要读取的字节数量。</param>
-    /// <exception cref="DisassemblerError"></exception>
+    /// <exception cref="DisassembleError"></exception>
     private void OffsetCheck(int consume) {
         if (offset + consume > bytes.Length) {
-            throw new DisassemblerError($"[At {OffsetToString()}] Need {consume} bytes but not enough.");
+            throw new DisassembleError($"[At {OffsetToString()}] Need {consume} bytes but not enough.");
         }
     }
 

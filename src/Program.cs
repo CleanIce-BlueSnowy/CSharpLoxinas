@@ -38,14 +38,14 @@ static class Program {
                 string otherName = Path.Combine(Path.GetDirectoryName(CommandArgs.InputFile) ?? "", Path.GetFileNameWithoutExtension(CommandArgs.InputFile));
                 if (!CommandArgs.SetMode) {
                     switch (extName.ToLower()) {
-                        case LoxinasInfo.SourceCodeExt:
+                        case LoxinasInfo.SourceCodeExt or "":
                             CommandArgs.Compile = true;
                             break;
                         case LoxinasInfo.IrCodeExt:
                             CommandArgs.Disassemble = true;
                             break;
                         default:
-                            throw new ProgramError($"Cannot infer the compiler mode from input file: Unknown extension `{extName}`.");
+                            throw new ProgramError($"Could not infer the compiler mode from input file: Unknown extension `{extName}`.");
                     }
                 }
 
@@ -127,7 +127,7 @@ static class Program {
         try {
             File.WriteAllBytes(CommandArgs!.OutputFile!, compiler.IrCodeBytes);
         } catch (Exception exc) {
-            throw new ProgramError($"Cannot write file: {exc.Message}");
+            throw new ProgramError($"Could not write file: {exc.Message}");
         }
 
         Logging.LogSuccess("Compiling finished.");
@@ -141,7 +141,7 @@ static class Program {
         try {
             bytes = File.ReadAllBytes(CommandArgs!.InputFile!);
         } catch (Exception exc) {
-            throw new ProgramError($"Cannot read file: {exc.Message}");
+            throw new ProgramError($"Could not read file: {exc.Message}");
         }
 
         Logging.LogInfo("Start diassembling.");
@@ -151,7 +151,7 @@ static class Program {
         string asm;
         try {
             asm = disasm.Disasm();
-        } catch (DisassemblerError error) {
+        } catch (DisassembleError error) {
             ErrorHandler.PrintError(error);
             Environment.Exit(1);
             return;
@@ -163,7 +163,7 @@ static class Program {
             try {
                 File.WriteAllText(CommandArgs!.OutputFile, asm);
             } catch (Exception exc) {
-                throw new ProgramError($"Cannot write file: {exc.Message}");
+                throw new ProgramError($"Could not write file: {exc.Message}");
             }
         }
 
@@ -180,7 +180,7 @@ static class Program {
         try {
             return File.ReadAllText(path);
         } catch (Exception exc) {
-            throw new ProgramError($"Cannot read file: {exc.Message}");
+            throw new ProgramError($"Could not read file: {exc.Message}");
         }
     }
 }

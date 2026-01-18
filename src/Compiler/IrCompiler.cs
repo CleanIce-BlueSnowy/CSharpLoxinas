@@ -31,6 +31,7 @@ public partial class IrCompiler {
     /// <exception cref="NotImplementedException"></exception>
     public void CompileExpression(Expr expr) => instructions.AddRange(expr switch {
         ExprLiteral exprLiteral => CompileExprLiteral(exprLiteral),
+        ExprBinary exprBinary => CompileExprBinary(exprBinary),
         _ => throw new NotImplementedException(),
     });
 

@@ -21,8 +21,16 @@ public interface IInstruction {
 /// </summary>
 /// <param name="value">常量值。</param>
 public struct InstConstant(IValue value) : IInstruction {
+    /// <summary>
+    /// 常量值。
+    /// </summary>
     public readonly IValue Value => value;
 
+    /// <summary>
+    /// 转换为字节序列。
+    /// </summary>
+    /// <returns>字节序列。</returns>
+    /// <exception cref="UnreachableException"></exception>
     public readonly byte[] ToBytes() {
         List<byte> bytes = [];
 
@@ -43,6 +51,36 @@ public struct InstConstant(IValue value) : IInstruction {
     }
 }
 
+/// <summary>
+/// Loxinas 抽象操作指令。
+/// </summary>
+/// <param name="opeType">操作数类型。</param>
+/// <param name="ope">操作符。</param>
+public struct InstOperation(LoxinasType opeType, Operator ope) : IInstruction {
+    /// <summary>
+    /// 操作数类型。
+    /// </summary>
+    public readonly LoxinasType OpeType => opeType;
+
+    /// <summary>
+    /// 操作符。
+    /// </summary>
+    public readonly Operator Ope => ope;
+
+    /// <summary>
+    /// 转换为字节序列。
+    /// </summary>
+    /// <returns>字节序列。</returns>
+    /// <exception cref="UnreachableException"></exception>
+    public readonly byte[] ToBytes() => (ope switch {
+        Operator.Add => opeType switch {
+            LoxinasType.Int32 => IrCode.IAdd32,
+            _ => throw new UnreachableException(),
+        },
+        _ => throw new UnreachableException(),
+    }).ToBytes();
+}
+
 #if DEBUG
 
 /// <summary>
@@ -57,6 +95,7 @@ public static class InstructionExtendDebug {
     /// <exception cref="UnreachableException"></exception>
     public static string DebugInfo(this IInstruction inst) => inst switch {
         InstConstant instConstant => PackInfo("Constant", GetInfo(instConstant)),
+        InstOperation instOperation => PackInfo("Operation", GetInfo(instOperation)),
         _ => throw new UnreachableException(),
     };
 
@@ -83,6 +122,18 @@ public static class InstructionExtendDebug {
     private static List<string> GetInfo(InstConstant inst) {
         List<string> info = [];
         info.Add($"Value: {inst.Value.DebugInfo()}");
+        return info;
+    }
+
+    /// <summary>
+    /// 获取常量指令信息。
+    /// </summary>
+    /// <param name="inst">常量指令。</param>
+    /// <returns>指令信息。</returns>
+    private static List<string> GetInfo(InstOperation inst) {
+        List<string> info = [];
+        info.Add($"Operation Type: {inst.OpeType.DebugInfo()}");
+        info.Add($"Operator: {inst.Ope.DebugInfo()}");
         return info;
     }
 }

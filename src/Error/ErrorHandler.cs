@@ -20,6 +20,9 @@ public static class ErrorHandler {
             case CompileError compileError:
                 PrintCompileError(compileError);
                 break;
+            case DisassembleError disassembleError:
+                PrintDisassembleError(disassembleError);
+                break;
         }
         Console.ResetColor();
     }
@@ -39,6 +42,12 @@ public static class ErrorHandler {
         PrintLocationSource(Program.sourceLines, error.Location);
         PrintNamedError("Compile Error", error);
     }
+
+    /// <summary>
+    /// 打印 Loxinas 反汇编错误。
+    /// </summary>
+    /// <param name="error">反汇编错误。</param>
+    private static void PrintDisassembleError(DisassembleError error) => PrintNamedError("Disassemble Error", error);
 
     /// <summary>
     /// 打印带名称的 Loxinas 错误。
