@@ -11,6 +11,23 @@ public enum LoxinasType {
 }
 
 /// <summary>
+/// 为 Loxinas 类型添加扩展方法。
+/// </summary>
+public static class LoxinasTypeExtensions {
+    /// <summary>
+    /// 原始代码表示。
+    /// </summary>
+    /// <param name="type">Loxinas 类型。</param>
+    /// <returns>表示字符串。</returns>
+    /// <exception cref="UnreachableException"></exception>
+    public static string RawRepr(this LoxinasType type) => type switch {
+        LoxinasType.Int32 => "int",
+        LoxinasType.Float64 => "double",
+        _ => throw new UnreachableException(),
+    };
+}
+
+/// <summary>
 /// 为 Loxinas 值添加类型相关方法。
 /// </summary>
 public static class ValueExtendLoxinasType {

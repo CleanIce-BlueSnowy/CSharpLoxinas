@@ -114,7 +114,13 @@ static class Program {
         Logging.LogSuccess("Parsing finished.");
 
         var compiler = new IrCompiler();
-        compiler.CompileExpression(expr);
+
+        try {
+            compiler.CompileExpression(expr);
+        } catch (CompileError error) {
+            ErrorHandler.PrintError(error);
+            return;
+        }
 
         #if DEBUG
         if (CommandArgs.DebugPrintInst) {

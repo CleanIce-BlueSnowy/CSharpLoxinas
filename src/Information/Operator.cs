@@ -16,6 +16,29 @@ public enum Operator {
     RightParen,
 }
 
+/// <summary>
+/// 为操作符添加扩展方法。
+/// </summary>
+public static class OperatorExtensions {
+    /// <summary>
+    /// 原始代码表示。
+    /// </summary>
+    /// <param name="ope">操作符。</param>
+    /// <returns>表示字符串。</returns>
+    /// <exception cref="UnreachableException"></exception>
+    public static string RawRepr(this Operator ope) => ope switch {
+        Operator.Add => "+",
+        Operator.Sub => "-",
+        Operator.Star => "*",
+        Operator.Slash => "/",
+        Operator.Equal => "=",
+        Operator.EqualEqual => "==",
+        Operator.LeftParen => "(",
+        Operator.RightParen => ")",
+        _ => throw new UnreachableException(),
+    };
+}
+
 #if DEBUG
 
 /// <summary>

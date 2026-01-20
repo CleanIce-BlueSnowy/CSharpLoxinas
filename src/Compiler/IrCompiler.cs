@@ -1,3 +1,4 @@
+using Information;
 using IR;
 
 namespace Compiler;
@@ -28,12 +29,17 @@ public partial class IrCompiler {
     /// 编译表达式。
     /// </summary>
     /// <param name="expr"></param>
+    /// <returns>表达式类型。</returns>
     /// <exception cref="NotImplementedException"></exception>
-    public void CompileExpression(Expr expr) => instructions.AddRange(expr switch {
-        ExprLiteral exprLiteral => CompileExprLiteral(exprLiteral),
-        ExprBinary exprBinary => CompileExprBinary(exprBinary),
-        _ => throw new NotImplementedException(),
-    });
+    public LoxinasType CompileExpression(Expr expr) {
+        ExprResult result = expr switch {
+            ExprLiteral exprLiteral => CompileExprLiteral(exprLiteral),
+            ExprBinary exprBinary => CompileExprBinary(exprBinary),
+            _ => throw new NotImplementedException(),
+        };
+        instructions.AddRange(result.Inst);
+        return result.Type;
+    }
 
     #if DEBUG
     /// <summary>
