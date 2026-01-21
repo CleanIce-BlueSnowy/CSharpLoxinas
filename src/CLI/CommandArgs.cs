@@ -31,6 +31,11 @@ public class CommandArgs {
     /// </summary>
     public bool Compile;
 
+    /// <summary>
+    /// 优化。
+    /// </summary>
+    public bool Optimize;
+
     #if DEBUG // ====== DEBUG BEGIN ======
     /// <summary>
     /// 是否在调试模式下启用词素打印。若不在调试模式下，则无法设置此参数。
@@ -95,6 +100,9 @@ public class CommandArgs {
                         Compile = true;
                         SetMode = true;
                     }
+                    break;
+                case "-O" or "--optimize":
+                    Optimize = true;
                     break;
                 case "-o" or "--output":
                     if (OutputFile is null) {

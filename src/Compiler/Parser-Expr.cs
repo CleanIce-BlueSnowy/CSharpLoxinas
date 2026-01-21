@@ -11,8 +11,8 @@ public partial class Parser {
     /// 等式表达式（解析操作符 <c>==</c> 与 <c>!=</c>）。
     /// </summary>
     /// <returns>表达式。</returns>
-    private Expr ExprEquality() {
-        Expr lhs = ExprTerm();
+    private IExpr ExprEquality() {
+        IExpr lhs = ExprTerm();
 
         while (lexer.Peek() is TokenOperator(_, Operator: Operator.EqualEqual) ope) {
             #if DEBUG
@@ -22,7 +22,7 @@ public partial class Parser {
             #endif
 
             lexer.Advance();
-            Expr rhs = ExprTerm();
+            IExpr rhs = ExprTerm();
             lhs = new ExprBinary(ope, lhs, rhs);
         }
 
@@ -33,8 +33,8 @@ public partial class Parser {
     /// 加减表达式（解析操作符 <c>+</c> 与 <c>-</c>）。
     /// </summary>
     /// <returns>表达式。</returns>
-    private Expr ExprTerm() {
-        Expr lhs = ExprFactor();
+    private IExpr ExprTerm() {
+        IExpr lhs = ExprFactor();
 
         while (lexer.Peek() is TokenOperator(_, Operator: Operator.Add or Operator.Sub) ope) {
             #if DEBUG
@@ -44,7 +44,7 @@ public partial class Parser {
             #endif
 
             lexer.Advance();
-            Expr rhs = ExprFactor();
+            IExpr rhs = ExprFactor();
             lhs = new ExprBinary(ope, lhs, rhs);
         }
 
@@ -55,8 +55,8 @@ public partial class Parser {
     /// 乘除表达式（解析操作符 <c>*</c> 与 <c>/</c>）。
     /// </summary>
     /// <returns>表达式。</returns>
-    private Expr ExprFactor() {
-        Expr lhs = ExprUnary();
+    private IExpr ExprFactor() {
+        IExpr lhs = ExprUnary();
 
         while (lexer.Peek() is TokenOperator(_, Operator: Operator.Star or Operator.Slash) ope) {
             #if DEBUG
@@ -66,7 +66,7 @@ public partial class Parser {
             #endif
 
             lexer.Advance();
-            Expr rhs = ExprUnary();
+            IExpr rhs = ExprUnary();
             lhs = new ExprBinary(ope, lhs, rhs);
         }
 
@@ -77,7 +77,7 @@ public partial class Parser {
     /// 一元表达式（解析操作符 <c>-</c>）。
     /// </summary>
     /// <returns></returns>
-    private Expr ExprUnary() {
+    private IExpr ExprUnary() {
         if (lexer.Peek() is TokenOperator(_, Operator: Operator.Sub) ope) {
             #if DEBUG
             if (Program.CommandArgs!.DebugPrintToken) {
@@ -86,7 +86,7 @@ public partial class Parser {
             #endif
 
             lexer.Advance();
-            Expr rhs = ExprUnary();
+            IExpr rhs = ExprUnary();
             return new ExprUnary(ope, rhs);
         } else {
             return ExprPrimary();
@@ -97,7 +97,7 @@ public partial class Parser {
     /// 基本表达式（字面量、标识符）。
     /// </summary>
     /// <returns>表达式。</returns>
-    private Expr ExprPrimary() {
+    private IExpr ExprPrimary() {
         switch (lexer.Peek()) {
             case TokenIdentifier tokenIdentifier:
                 #if DEBUG
@@ -127,7 +127,7 @@ public partial class Parser {
                 #endif
 
                 lexer.Advance();
-                Expr expr = ParseExpression();
+                IExpr expr = ParseExpression();
                 if (lexer.Peek() is not TokenOperator { Operator: Operator.RightParen }) {
                     throw new CompileError(lexer.Advance().Location, "Expected `)` after the expression.");
                 }

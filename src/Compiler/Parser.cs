@@ -14,5 +14,5 @@ public partial class Parser(Lexer lexer) {
     /// 解析表达式。
     /// </summary>
     /// <returns>表达式。</returns>
-    public Expr ParseExpression() => ExprEquality();
+    public IExpr ParseExpression() => ExprEquality();
 }

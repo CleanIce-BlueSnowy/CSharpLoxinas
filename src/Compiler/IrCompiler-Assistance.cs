@@ -1,4 +1,3 @@
-using Information;
 using IR;
 
 namespace Compiler;
@@ -12,5 +11,5 @@ public partial class IrCompiler {
     /// </summary>
     /// <param name="Type"></param>
     /// <param name="Inst"></param>
-    private record struct ExprResult(LoxinasType Type, List<IInstruction> Inst);
+    private record struct ExprResult(Information.LoxinasType Type, List<IInstruction> Inst);
 }

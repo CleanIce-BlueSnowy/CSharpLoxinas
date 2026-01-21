@@ -25,21 +25,21 @@ public partial class IrCompiler {
         }
     }
 
+    public void Compile(IExpr expr) {
+        instructions.AddRange(CompileExpression(ref expr).Inst);
+    }
+
     /// <summary>
     /// 编译表达式。
     /// </summary>
     /// <param name="expr"></param>
     /// <returns>表达式类型。</returns>
     /// <exception cref="NotImplementedException"></exception>
-    public LoxinasType CompileExpression(Expr expr) {
-        ExprResult result = expr switch {
-            ExprLiteral exprLiteral => CompileExprLiteral(exprLiteral),
-            ExprBinary exprBinary => CompileExprBinary(exprBinary),
-            _ => throw new NotImplementedException(),
-        };
-        instructions.AddRange(result.Inst);
-        return result.Type;
-    }
+    private ExprResult CompileExpression(ref IExpr expr) => expr switch {
+        ExprLiteral => CompileExprLiteral(ref expr),
+        ExprBinary => CompileExprBinary(ref expr),
+        _ => throw new NotImplementedException(),
+    };
 
     #if DEBUG
     /// <summary>

@@ -8,7 +8,7 @@ namespace Compiler;
 /// 词素。
 /// </summary>
 /// <param name="Location">位置信息。</param>
-public abstract record Token(Location Location);
+public record Token(Location Location);
 
 /// <summary>
 /// EOF 词素，表示文件尾。

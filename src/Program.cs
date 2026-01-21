@@ -60,6 +60,10 @@ static class Program {
                     }
                 }
 
+                if (!CommandArgs.Compile && CommandArgs.Optimize) {
+                    throw new ProgramError("Can only enable optimization in compile mode.");
+                }
+
                 if (CommandArgs.Compile) {
                     Compile();
                 } else if (CommandArgs.Disassemble) {
@@ -94,7 +98,7 @@ static class Program {
 
         var parser = new Parser(new(source));
 
-        Expr expr;
+        IExpr expr;
 
         try {
             expr = parser.ParseExpression();
@@ -116,7 +120,7 @@ static class Program {
         var compiler = new IrCompiler();
 
         try {
-            compiler.CompileExpression(expr);
+            compiler.Compile(expr);
         } catch (CompileError error) {
             ErrorHandler.PrintError(error);
             return;
