@@ -1,0 +1,42 @@
+[Info] Start compiling.
+[Debug] ====== The AST ======
+Expr [Binary] => {
+    Location: [line 1 at 1-15]
+    Operator: Token [Operator] => {
+        Location: [line 1 at 11]
+        Operator: Sub `-`
+    }
+    Lhs: Expr [Binary] => {
+        Location: [line 1 at 1-9]
+        Operator: Token [Operator] => {
+            Location: [line 1 at 7]
+            Operator: Add `+`
+        }
+        Lhs: Expr [Binary] => {
+            Location: [line 1 at 1-5]
+            Operator: Token [Operator] => {
+                Location: [line 1 at 3]
+                Operator: Sub `-`
+            }
+            Lhs: Expr [Literal] => {
+                Location: [line 1 at 1]
+                Value: Value [Int32]: 1
+            }
+            Rhs: Expr [Literal] => {
+                Location: [line 1 at 5]
+                Value: Value [Int32]: 1
+            }
+        }
+        Rhs: Expr [Literal] => {
+            Location: [line 1 at 9]
+            Value: Value [Int32]: 5
+        }
+    }
+    Rhs: Expr [Literal] => {
+        Location: [line 1 at 13-15]
+        Value: Value [Int32]: 100
+    }
+}
+[Debug] ====== End ======
+[Success] Parsing finished.
+[Success] Compiling finished.

@@ -47,7 +47,11 @@ public partial class IrCompiler {
     /// </summary>
     public void PrintInstructions() {
         foreach (IInstruction inst in instructions) {
-            Console.WriteLine(inst.DebugInfo());
+            if (Program.LogFile is null) {
+                Console.WriteLine(inst.DebugInfo());
+            } else {
+                Program.LogFile.WriteLine(inst.DebugInfo());
+            }
         }
     }
     #endif

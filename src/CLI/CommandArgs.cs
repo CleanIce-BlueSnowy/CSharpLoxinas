@@ -17,9 +17,19 @@ public class CommandArgs {
     public string? OutputFile;
 
     /// <summary>
+    /// 日志文件。
+    /// </summary>
+    public string? LogFile;
+
+    /// <summary>
     /// 是否设置了编译器模式。未设置则需要自己设置。
     /// </summary>
     public readonly bool SetMode;
+
+    /// <summary>
+    /// 运行。
+    /// </summary>
+    public bool Run;
 
     /// <summary>
     /// 反汇编。
@@ -52,6 +62,11 @@ public class CommandArgs {
     /// </summary>
     public readonly bool DebugPrintInst;
 
+    /// <summary>
+    /// 是否在调试模式下启用运行信息打印。
+    /// </summary>
+    public readonly bool DebugLogRunning;
+
     #endif  // ====== DEBUG END ======
 
     /// <summary>
@@ -68,26 +83,41 @@ public class CommandArgs {
                     #if DEBUG
                     DebugPrintToken = true;
                     #else
-                    exceptions.Add(new($"Argument `{arg}` must be used in loxinas debug mode."));
+                    exceptions.Add(new($"Unknown argument `{arg}`."));
                     #endif
                     break;
                 case "--debug-print-ast" or "--debug-pa":
                     #if DEBUG
                     DebugPrintAst = true;
                     #else
-                    exceptions.Add(new($"Argument `{arg}` must be used in loxinas debug mode."));
+                    exceptions.Add(new($"Unknown argument `{arg}`."));
                     #endif
                     break;
                 case "--debug-print-instruction" or "--debug-print-inst" or "--debug-pi":
                     #if DEBUG
                     DebugPrintInst = true;
                     #else
-                    exceptions.Add(new($"Argument `{arg}` must be used in loxinas debug mode."));
+                    exceptions.Add(new($"Unknown argument `{arg}`."));
                     #endif
+                    break;
+                case "--debug-log-running" or "--debug-lr":
+                    #if DEBUG
+                    DebugLogRunning = true;
+                    #else
+                    exceptions.Add(new($"Unknown argument `{arg}`."));
+                    #endif
+                    break;
+                case "--run" or "-r":
+                    if (SetMode) {
+                        exceptions.Add(new("Cannot set disassemble mode with other modes in the same time."));
+                    } else {
+                        Run = true;
+                        SetMode = true;
+                    }
                     break;
                 case "--disassemble" or "--disasm":
                     if (SetMode) {
-                        exceptions.Add(new($"Cannot set disassemble mode with other modes in the same time."));
+                        exceptions.Add(new("Cannot set disassemble mode with other modes in the same time."));
                     } else {
                         Disassemble = true;
                         SetMode = true;
@@ -95,7 +125,7 @@ public class CommandArgs {
                     break;
                 case "-c" or "--compile":
                     if (SetMode) {
-                        exceptions.Add(new($"Cannot set compile mode with other modes in the same time."));
+                        exceptions.Add(new("Cannot set compile mode with other modes in the same time."));
                     } else {
                         Compile = true;
                         SetMode = true;
@@ -105,10 +135,23 @@ public class CommandArgs {
                     Optimize = true;
                     break;
                 case "-o" or "--output":
+                    if (i + 1 >= args.Length) {
+                        exceptions.Add(new("Output file excepted."));
+                    }
                     if (OutputFile is null) {
                         OutputFile = args[++i];
                     } else {
                         exceptions.Add(new($"Multiplied output file `{args[++i]}`."));
+                    }
+                    break;
+                case "--log":
+                    if (i + 1 >= args.Length) {
+                        exceptions.Add(new("Log file excepted."));
+                    }
+                    if (LogFile is null) {
+                        LogFile = args[++i];
+                    } else {
+                        exceptions.Add(new($"Multiplied log file `{args[++i]}`."));
                     }
                     break;
                 default:

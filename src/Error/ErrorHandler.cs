@@ -12,7 +12,9 @@ public static class ErrorHandler {
     /// </summary>
     /// <param name="error">Loxinas 错误。</param>
     public static void PrintError(LoxinasError error) {
-        Console.ForegroundColor = ConsoleColor.Red;
+        if (Program.LogFile is null) {
+            Console.ForegroundColor = ConsoleColor.Red;
+        }
         switch (error) {
             case ProgramError programError:
                 PrintProgramError(programError);
@@ -24,7 +26,9 @@ public static class ErrorHandler {
                 PrintDisassembleError(disassembleError);
                 break;
         }
-        Console.ResetColor();
+        if (Program.LogFile is null) {
+            Console.ResetColor();
+        }
     }
 
     /// <summary>
@@ -38,7 +42,11 @@ public static class ErrorHandler {
     /// </summary>
     /// <param name="error">编译错误。</param>
     private static void PrintCompileError(CompileError error) {
-        Console.WriteLine(error.Location);
+        if (Program.LogFile is null) {
+            Console.WriteLine(error.Location);
+        } else {
+            Program.LogFile.WriteLine(error.Location);
+        }
         PrintLocationSource(Program.sourceLines, error.Location);
         PrintNamedError("Compile Error", error);
     }
@@ -63,22 +71,52 @@ public static class ErrorHandler {
     /// <param name="location">位置信息。</param>
     private static void PrintLocationSource(string[] sourceLines, Location location) {
         string firstLine = sourceLines[location.Start.Line - 1];
-        Console.WriteLine($"|> {firstLine}");
+        string output = $"|> {firstLine}";
+        if (Program.LogFile is null) {
+            Console.WriteLine(output);
+        } else {
+            Program.LogFile.WriteLine(output);
+        }
         if (location.End.Line == location.Start.Line) {
             string spaces = new(' ', location.Start.Idx);
             string arrows = new('^', location.End.Idx - location.Start.Idx);
-            Console.WriteLine($"|> {spaces}{arrows}");
+            output = $"|> {spaces}{arrows}";
+            if (Program.LogFile is null) {
+                Console.WriteLine(output);
+            } else {
+                Program.LogFile.WriteLine(output);
+            }
         } else {
             string firstLineSpaces = new(' ', location.Start.Idx);
             string firstLineArrows = new('^', firstLine.Length - location.Start.Idx);
-            Console.WriteLine($"|> {firstLineSpaces}{firstLineArrows}");
+            output = $"|> {firstLineSpaces}{firstLineArrows}";
+            if (Program.LogFile is null) {
+                Console.WriteLine(output);
+            } else {
+                Program.LogFile.WriteLine(output);
+            }
             if (location.End.Line - location.Start.Line > 1) {  // 注意超尾位置（左闭右开）。
-                Console.WriteLine($"|> ...");
+                output = $"|> ...";
+                if (Program.LogFile is null) {
+                    Console.WriteLine(output);
+                } else {
+                    Program.LogFile.WriteLine(output);
+                }
             }
             string lastLine = sourceLines[location.End.Line - 1];
-            Console.WriteLine($"|> {lastLine}");
+            output = $"|> {lastLine}";
+            if (Program.LogFile is null) {
+                Console.WriteLine(output);
+            } else {
+                Program.LogFile.WriteLine(output);
+            }
             string lastLineArrows = new('^', location.End.Idx - 1);
-            Console.WriteLine($"|> {lastLineArrows}");
+            output = $"|> {lastLineArrows}";
+            if (Program.LogFile is null) {
+                Console.WriteLine(output);
+            } else {
+                Program.LogFile.WriteLine(output);
+            }
         }
     }
 }

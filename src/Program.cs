@@ -3,6 +3,7 @@ using Compiler;
 using Debug;
 using Error;
 using IR;
+using VM;
 
 /// <summary>
 /// 主程序。
@@ -19,6 +20,11 @@ static class Program {
     public static CommandArgs? CommandArgs = null;
 
     /// <summary>
+    /// 日志输出文件。
+    /// </summary>
+    public static StreamWriter? LogFile = null;
+
+    /// <summary>
     /// 入口点。
     /// </summary>
     /// <param name="args">命令行参数。</param>
@@ -33,6 +39,10 @@ static class Program {
                 Environment.Exit(1);
             }
 
+            if (CommandArgs.LogFile is not null) {
+                LogFile = new(CommandArgs.LogFile);
+            }
+
             if (CommandArgs.InputFile is not null) {
                 string extName = Path.GetExtension(CommandArgs.InputFile);
                 string otherName = Path.Combine(Path.GetDirectoryName(CommandArgs.InputFile) ?? "", Path.GetFileNameWithoutExtension(CommandArgs.InputFile));
@@ -42,7 +52,7 @@ static class Program {
                             CommandArgs.Compile = true;
                             break;
                         case LoxinasInfo.IrCodeExt:
-                            CommandArgs.Disassemble = true;
+                            CommandArgs.Run = true;
                             break;
                         default:
                             throw new ProgramError($"Could not infer the compiler mode from input file: Unknown extension `{extName}`.");
@@ -68,6 +78,8 @@ static class Program {
                     Compile();
                 } else if (CommandArgs.Disassemble) {
                     Disassemble();
+                } else if (CommandArgs.Run) {
+                    Run();
                 }
             } else {  // 无给出文件。
                 Console.WriteLine(LoxinasInfo.Version);
@@ -75,6 +87,8 @@ static class Program {
         } catch (ProgramError error) {
             ErrorHandler.PrintError(error);
             Environment.Exit(2);
+        } finally {
+            LogFile?.Close();
         }
     }
 
@@ -110,7 +124,11 @@ static class Program {
         #if DEBUG
         if (CommandArgs.DebugPrintAst) {
             Logging.LogDebug("====== The AST ======");
-            Console.WriteLine(AstPrinter.Print(expr));
+            if (LogFile is null) {
+                Console.WriteLine(AstPrinter.Print(expr));
+            } else {
+                LogFile.WriteLine(AstPrinter.Print(expr));
+            }
             Logging.LogDebug("====== End ======");
         }
         #endif
@@ -178,6 +196,30 @@ static class Program {
         }
 
         Logging.LogSuccess("Disassembling finished.");
+    }
+
+    private static void Run() {
+        byte[] bytes;
+        try {
+            bytes = File.ReadAllBytes(CommandArgs!.InputFile!);
+        } catch (Exception exc) {
+            throw new ProgramError($"Could not read file: {exc.Message}");
+        }
+
+        #if DEBUG
+        if (CommandArgs!.DebugLogRunning) {
+            Logging.LogInfo("Start running.");
+        }
+        #endif
+
+        var vm = new VirtualMachine(bytes);
+        vm.Run();
+
+        #if DEBUG
+        if (CommandArgs!.DebugLogRunning) {
+            Logging.LogInfo("Running finished.");
+        }
+        #endif
     }
 
     /// <summary>

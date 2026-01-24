@@ -9,9 +9,14 @@ public static class Logging {
     /// </summary>
     /// <param name="msg">信息。</param>
     public static void LogInfo(string msg) {
-        Console.ForegroundColor = ConsoleColor.Blue;
-        Console.WriteLine($"[Info] {msg}");
-        Console.ResetColor();
+        string output = $"[Info] {msg}";
+        if (Program.LogFile is null) {
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine(output);
+            Console.ResetColor();
+        } else {
+            Program.LogFile.WriteLine(output);
+        }
     }
 
     /// <summary>
@@ -19,9 +24,14 @@ public static class Logging {
     /// </summary>
     /// <param name="msg">信息。</param>
     public static void LogSuccess(string msg) {
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"[Success] {msg}");
-        Console.ResetColor();
+        string output = $"[Success] {msg}";
+        if (Program.LogFile is null) {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine(output);
+            Console.ResetColor();
+        } else {
+            Program.LogFile.WriteLine(output);
+        }
     }
 
     /// <summary>
@@ -29,9 +39,14 @@ public static class Logging {
     /// </summary>
     /// <param name="msg">信息。</param>
     public static void LogError(string msg) {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"[Error] {msg}");
-        Console.ResetColor();
+        string output = $"[Error] {msg}";
+        if (Program.LogFile is null) {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(output);
+            Console.ResetColor();
+        } else {
+            Program.LogFile.WriteLine(output);
+        }
     }
 
     #if DEBUG
@@ -40,9 +55,14 @@ public static class Logging {
     /// </summary>
     /// <param name="msg">信息。</param>
     public static void LogDebug(string msg) {
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine($"[Debug] {msg}");
-        Console.ResetColor();
+        string output = $"[Debug] {msg}";
+        if (Program.LogFile is null) {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine(output);
+            Console.ResetColor();
+        } else {
+            Program.LogFile.WriteLine(output);
+        }
     }
     #endif
 }
