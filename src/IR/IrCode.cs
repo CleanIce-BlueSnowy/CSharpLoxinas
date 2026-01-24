@@ -9,6 +9,7 @@ public enum IrCode : ushort {
     Constant32,
     Constant64,
     IAdd32,
+    ISub32,
 
     /// <summary>
     /// 最大有效值（不包括）。

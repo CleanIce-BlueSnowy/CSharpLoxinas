@@ -19,6 +19,25 @@ public record struct ValueInt32(int Value) : IValue;
 /// <param name="Value">数值。</param>
 public record struct ValueFloat64(double Value): IValue;
 
+/// <summary>
+/// 为值添加扩展方法。
+/// </summary>
+public static class ValueExtensions {
+    /// <summary>
+    /// 获取 32 位有符号整数值。
+    /// </summary>
+    /// <param name="value">Loxinas 值。</param>
+    /// <returns>32 位有符号整数。</returns>
+    public static int GetInt32Value(this IValue value) => ((ValueInt32)value).Value;
+
+    /// <summary>
+    /// 获取 64 位双精度浮点数值。
+    /// </summary>
+    /// <param name="value">Loxinas 值。</param>
+    /// <returns>64 位双精度浮点数值。</returns>
+    public static double GetFloat64Value(this IValue value) => ((ValueFloat64)value).Value;
+}
+
 #if DEBUG
 
 /// <summary>

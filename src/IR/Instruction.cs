@@ -77,6 +77,10 @@ public struct InstOperation(LoxinasType opeType, Operator ope) : IInstruction {
             LoxinasType.Int32 => IrCode.IAdd32,
             _ => throw new UnreachableException(),
         },
+        Operator.Sub => opeType switch {
+            LoxinasType.Int32 => IrCode.ISub32,
+            _ => throw new UnreachableException(),
+        },
         _ => throw new UnreachableException(),
     }).ToBytes();
 }

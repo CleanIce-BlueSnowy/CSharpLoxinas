@@ -39,7 +39,11 @@ public partial class IrCompiler {
         if (Program.CommandArgs!.Optimize && expr.Lhs is ExprLiteral lhs && expr.Rhs is ExprLiteral rhs) {
             IValue newValue = expr.Operator.Operator switch {
                 Operator.Add => lhsRes.Type switch {
-                    LoxinasType.Int32 => new ValueInt32(((ValueInt32)lhs.Value).Value + ((ValueInt32)rhs.Value).Value),
+                    LoxinasType.Int32 => new ValueInt32(lhs.Value.GetInt32Value() + rhs.Value.GetInt32Value()),
+                    _ => throw new UnreachableException(),
+                },
+                Operator.Sub => lhsRes.Type switch {
+                    LoxinasType.Int32 => new ValueInt32(lhs.Value.GetInt32Value() - rhs.Value.GetInt32Value()),
                     _ => throw new UnreachableException(),
                 },
                 _ => throw new UnreachableException(),

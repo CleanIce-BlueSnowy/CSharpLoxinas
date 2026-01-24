@@ -59,6 +59,7 @@ public class Disassembler(byte[] bytes) {
             IrCode.Constant32 => PackCode(oldOffset, "Constant", "4 Bytes", [DisasmValue32()]),
             IrCode.Constant64 => PackCode(oldOffset, "Constant", "8 Bytes", [DisasmValue64()]),
             IrCode.IAdd32 => PackCode(oldOffset, "IAdd", "4 Bytes", []),
+            IrCode.ISub32 => PackCode(oldOffset, "ISub", "4 Bytes", []),
             _ => throw new UnreachableException(),
         };
     }
