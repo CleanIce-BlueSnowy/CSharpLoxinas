@@ -1,4 +1,4 @@
-﻿using CLI;
+using CLI;
 using Compiler;
 using Debug;
 using Error;
